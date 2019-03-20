@@ -8,6 +8,7 @@ var position = {x:0, y:0};
 
 manager.on('added', function (evt, nipple) {
     nipple.on('start move end dir plain', function (evt, data) {
+        position = {x:0, y:0};
         if(evt.type == 'move'){
             if(data.direction){
                 var x = data.direction.x;
