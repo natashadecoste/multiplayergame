@@ -29,7 +29,7 @@ The terminal running npm start is running webpack and watching files for changes
 - don't commit node_modules folder or public (should be set up in .gitignore for you)
 - don't change any files within the public folder, these are going to be rewritten by webpack and you WILL lose EVERYTHING. LITERALLY no going back.. 
 
-#Contributers
+# Contributers
 - Troy Kuang
 - Natasha Decoste
 - Nicolas Tristani
