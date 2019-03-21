@@ -27,24 +27,23 @@ manager
     nipple.on("dir dir:left dir:right dir:up dir:down", function(evt, data) {
       position = { x: 0, y: 0 };
       if (evt.type == "dir:up") {
-        position.y = -1;
+        position.y = -2;
       }
       if (evt.type == "dir:left") {
-        position.x = -1;
+        position.x = -2;
       }
       if (evt.type == "dir:down") {
-        position.y = 1;
+        position.y = 2;
       }
       if (evt.type == "dir:right") {
-        position.x = 1;
+        position.x = 2;
       }
     });
 
     nipple.on("end", function(evt, data) {
-        // tell the server there has been a movement
-        position = { x: 0, y: 0 };
-      });
-
+      // tell the server there has been a movement
+      position = { x: 0, y: 0 };
+    });
   })
   .on("removed", function(evt, nipple) {
     nipple.off("start move end dir plain"); // removing listener from all events
@@ -78,7 +77,7 @@ function createControls() {
     zone: document.getElementById("joystick-wrapper"),
     multitouch: false,
     maxNumberOfNipples: 1,
-    mode: "semi",
+    mode: "dynamic",
     restOpacity: 1,
     color: "black"
   });
@@ -88,25 +87,27 @@ function createControls() {
 function keyDownHandler(e) {
   position = { x: 0, y: 0 };
   if (e.keyCode == 39) {
-    position.x = 3;
+    position.x = 2;
   } else if (e.keyCode == 37) {
-    position.x = -3;
+    position.x = -2;
   } else if (e.keyCode == 38) {
-    position.y = -3;
+    position.y = -2;
   } else if (e.keyCode == 40) {
-    position.y = 3;
+    position.y = 2;
   }
-  socket.emit("playerMove", position);
+}
+
+function keyUpHandler() {
+  position = { x: 0, y: 0 };
 }
 
 // binds all document keydown (from keyboard) to the handler for player movement
 function bindControls() {
   document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
 }
-
 
 // will continuously check if we need to resend the playermove
 setInterval(() => {
-    socket.emit("playerMove", position);
-  }, 1000 / 60);
-  
+  socket.emit("playerMove", position);
+}, 1000 / 60);
