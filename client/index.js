@@ -1,63 +1,58 @@
-import './../styles/styles.scss';
+import "./../styles/styles.scss";
 import nipplejs from "nipplejs";
-
 
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const socket = io();
 const manager = createControls();
 var position = { x: 0, y: 0 };
- 
+
 init();
 
+function init() {
+  // resizing to a full sized canvas
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-function init(){
+  // binding the keyboard controls to the document
+  bindControls();
 
-    // resizing to a full sized canvas
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    // binding the keyboard controls to the document
-    bindControls();
-
-    // let the server know we have another player
-    socket.emit("newPlayer");
-
+  // let the server know we have another player
+  socket.emit("newPlayer");
 }
 
 manager
   .on("added", function(evt, nipple) {
     // we send ALL nipple events here (probably should not do that lol)
-    nipple.on("start move end dir plain", function(evt, data) {
+    nipple.on("dir dir:left dir:right dir:up dir:down", function(evt, data) {
       position = { x: 0, y: 0 };
-      if (evt.type == "move") {
-        if (data.direction) {
-          var x = data.direction.x;
-          if (x == "left") {
-            position.x = -1;
-          } else if (x == "right") {
-            position.x = 1;
-          }
-          var y = data.direction.y;
-          if (y == "up") {
-            position.y = -1;
-          } else if (y == "down") {
-            position.y = 1;
-          }
-        }
+      if (evt.type == "dir:up") {
+        position.y = -1;
       }
-      // tell the server there has been a movement 
-      socket.emit("playerMove", position);
+      if (evt.type == "dir:left") {
+        position.x = -1;
+      }
+      if (evt.type == "dir:down") {
+        position.y = 1;
+      }
+      if (evt.type == "dir:right") {
+        position.x = 1;
+      }
     });
+
+    nipple.on("end", function(evt, data) {
+        // tell the server there has been a movement
+        position = { x: 0, y: 0 };
+      });
+
   })
   .on("removed", function(evt, nipple) {
     nipple.off("start move end dir plain"); // removing listener from all events
   });
 
-
 // socket response to a state emit from the server
 socket.on("state", function(gameState) {
-    // need to clear the canvas otherwise it gets drawn ON TOP
+  // need to clear the canvas otherwise it gets drawn ON TOP
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // if we have enemies/coins/anything else we need to all draw them
@@ -83,13 +78,11 @@ function createControls() {
     zone: document.getElementById("joystick-wrapper"),
     multitouch: false,
     maxNumberOfNipples: 1,
-    mode: "dynamic",
+    mode: "semi",
     restOpacity: 1,
     color: "black"
   });
 }
-
-
 
 // how to handle moving the player along the canvas
 function keyDownHandler(e) {
@@ -109,5 +102,11 @@ function keyDownHandler(e) {
 // binds all document keydown (from keyboard) to the handler for player movement
 function bindControls() {
   document.addEventListener("keydown", keyDownHandler, false);
-  
 }
+
+
+// will continuously check if we need to resend the playermove
+setInterval(() => {
+    socket.emit("playerMove", position);
+  }, 1000 / 60);
+  
