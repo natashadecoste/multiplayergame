@@ -45,35 +45,36 @@ io.on("connection", socket => {
   console.log("a user connected:", socket.id);
 
   socket.on("disconnect", function() {
-	console.log("user disconnected");
-	delete gameState.players[socket.id];
+    console.log("user disconnected");
+    delete gameState.players[socket.id];
   });
 
-  socket.on("newPlayer", function(){
-	gameState.players[socket.id] = {
-		x: 200,
-		y: 200,
-		width: 20,
-		height: 20 
-	};
-    
+  socket.on("newPlayer", function() {
+    gameState.players[socket.id] = {
+      x: 200,
+      y: 200,
+      width: 20,
+      height: 20
+    };
   });
 
-  socket.on('playerMove', function(position){
-	var oldx = gameState.players[socket.id].x;
-	var oldy = gameState.players[socket.id].y;
-	gameState.players[socket.id] = {
-		x: oldx + position.x,
-		y: oldy + position.y,
-		width: 20,
-		height: 20 
-	};
-
+  socket.on("playerMove", function(position) {
+    var oldx = gameState.players[socket.id]
+      ? gameState.players[socket.id].x
+      : 0;
+    var oldy = gameState.players[socket.id]
+      ? gameState.players[socket.id].y
+      : 0;
+    gameState.players[socket.id] = {
+      x: oldx + position.x,
+      y: oldy + position.y,
+      width: 20,
+      height: 20
+    };
   });
 });
 
-
 // will continuously broadcast the state to the players
 setInterval(() => {
-	io.sockets.emit('state', gameState);
+  io.sockets.emit("state", gameState);
 }, 1000 / 60);
