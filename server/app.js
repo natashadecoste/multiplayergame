@@ -8,6 +8,9 @@ const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 
+const canvasWidth = 1280;
+const canvasHeight = 800;
+
 // game logic
 const gameState = {
   players: {}
@@ -65,9 +68,26 @@ io.on("connection", socket => {
     var oldy = gameState.players[socket.id]
       ? gameState.players[socket.id].y
       : 0;
+
+    var newx = oldx + position.x
+    if (newx > canvasWidth){
+      newx = 0;
+    }
+    else if (newx < 0) {
+      newx = canvasWidth
+    }
+    
+    var newy = oldy + position.y
+    if (newy > canvasHeight){
+      newy = 0;
+    }
+    else if (newy < 0) {
+      newy = canvasHeight
+    }
+
     gameState.players[socket.id] = {
-      x: oldx + position.x,
-      y: oldy + position.y,
+      x: newx,
+      y: newy,
       width: 20,
       height: 20
     };
