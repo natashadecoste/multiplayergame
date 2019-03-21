@@ -13,7 +13,8 @@ const canvasHeight = 800;
 
 // game logic
 const gameState = {
-  players: {}
+  players: {},
+  coins: {}
 };
 
 app.use(morgan("dev"));
@@ -46,6 +47,7 @@ server.listen(PORT, () => {
 // socket responds to things here
 io.on("connection", socket => {
   console.log("a user connected:", socket.id);
+  
 
   socket.on("disconnect", function() {
     console.log("user disconnected");
@@ -53,15 +55,28 @@ io.on("connection", socket => {
   });
 
   socket.on("newPlayer", function() {
+    // adding new player to players array and setting their spawn location
     gameState.players[socket.id] = {
       x: 200,
       y: 200,
       width: 20,
       height: 20
     };
+    gameState.coins[socket.id] = {
+      // randomizing spawn point and color
+      x : Math.floor(Math.random()*600),
+      y : Math.floor(Math.random()*600),
+      radius : 10,
+      r : Math.floor(Math.random()*255),
+      g : Math.floor(Math.random()*255),
+      b : Math.floor(Math.random()*255)
+    };
+    console.log(gameState.coins[socket.id]);
+    console.log("hello player");
   });
 
   socket.on("playerMove", function(position) {
+    // updating player x and y once they move
     var oldx = gameState.players[socket.id]
       ? gameState.players[socket.id].x
       : 0;

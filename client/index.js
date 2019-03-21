@@ -27,6 +27,7 @@ function init() {
 
   // let the server know we have another player
   socket.emit("newPlayer");
+  //socket.emit("newCoin");
 }
 
 manager
@@ -100,6 +101,7 @@ function drawThings(players) {
         players[player].y < cam.y + window.innerHeight
       ) {
         drawPlayer(players[player]);
+        drawCoin(gameState.coins[player]);
       }
     }
   }
@@ -110,6 +112,15 @@ const drawPlayer = player => {
   ctx.beginPath();
   ctx.rect(player.x - cam.x, player.y - cam.y, player.width, player.height);
   ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+};
+
+// drawing a coin
+const drawCoin = coin => {
+  ctx.beginPath();
+  ctx.arc(coin.x, coin.y, coin.radius, Math.PI*2,0, false);
+  ctx.fillStyle = "rgba(" + coin.r + "," + coin.g + "," + coin.b + ",1)";
   ctx.fill();
   ctx.closePath();
 };
