@@ -86,13 +86,13 @@ function createControls() {
 // how to handle moving the player along the canvas
 function keyDownHandler(e) {
   position = { x: 0, y: 0 };
-  if (e.keyCode == 39) {
+  if (e.keyCode == 39 || e.keyCode == 68) {
     position.x = 2;
-  } else if (e.keyCode == 37) {
+  } else if (e.keyCode == 37 || e.keyCode == 65) {
     position.x = -2;
-  } else if (e.keyCode == 38) {
+  } else if (e.keyCode == 38 || e.keyCode == 87) {
     position.y = -2;
-  } else if (e.keyCode == 40) {
+  } else if (e.keyCode == 40 || e.keyCode == 83) {
     position.y = 2;
   }
 }
