@@ -4,6 +4,23 @@
     margin: 0;
 }
 
+#myCanvas {
+    width: 100vw;
+    height: 100vh;
+    background: lightgreen;
+
+}
+
+#minimap {
+    background: lightblue;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    opacity: 0.9;
+}
+
 #joystick-wrapper {
     position: absolute;
     width: 100vw;

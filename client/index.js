@@ -2,10 +2,16 @@ import "./../styles/styles.scss";
 import nipplejs from "nipplejs";
 
 const canvas = document.getElementById("myCanvas");
+const minimap = document.getElementById("minimap");
+
+const world = { x: 1000, y: 1000 };
 const ctx = canvas.getContext("2d");
+const ctxm = minimap.getContext("2d");
+
 const socket = io();
 const manager = createControls();
-var position = { x: 0, y: 0 };
+var positionDiff = { x: 0, y: 0 };
+var cam = { x: 0, y: 0 };
 
 init();
 
@@ -27,24 +33,24 @@ manager
   .on("added", function(evt, nipple) {
     // we send ALL nipple events here (probably should not do that lol)
     nipple.on("dir dir:left dir:right dir:up dir:down", function(evt, data) {
-      position = { x: 0, y: 0 };
+      positionDiff = { x: 0, y: 0 };
       if (evt.type == "dir:up") {
-        position.y = -2;
+        positionDiff.y = -2;
       }
       if (evt.type == "dir:left") {
-        position.x = -2;
+        positionDiff.x = -2;
       }
       if (evt.type == "dir:down") {
-        position.y = 2;
+        positionDiff.y = 2;
       }
       if (evt.type == "dir:right") {
-        position.x = 2;
+        positionDiff.x = 2;
       }
     });
 
     nipple.on("end", function(evt, data) {
       // tell the server there has been a movement
-      position = { x: 0, y: 0 };
+      positionDiff = { x: 0, y: 0 };
     });
   })
   .on("removed", function(evt, nipple) {
@@ -53,20 +59,56 @@ manager
 
 // socket response to a state emit from the server
 socket.on("state", function(gameState) {
-  // need to clear the canvas otherwise it gets drawn ON TOP
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // if we have enemies/coins/anything else we need to all draw them
-  // (or possible have a collection of all game items and iterate through that?)
-  for (let player in gameState.players) {
-    drawPlayer(gameState.players[player]);
+  try {
+    getCameraPosition(gameState.players, socket.id);
+    drawThings(gameState.players);
+    drawMiniMap(gameState.players);
+  } catch (err) {
+    console.log("no players yet ...");
   }
 });
+
+function getCameraPosition(players, id) {
+  //console.log("player position: " + players[id].x + " " + players[id].y);
+  cam = { x: players[id].x, y: players[id].y };
+}
+
+function clamp(value, min, max) {
+  if (value < min) return min;
+  else if (value > max) return max;
+  return value;
+}
+
+function drawThings(players) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); //clear the viewport AFTER the matrix is reset
+
+  //  Clamp the camera position to the world bounds while centering the camera around the player
+  cam.x = clamp(cam.x - window.innerWidth / 2, 0, world.x - window.innerWidth);
+  cam.y = clamp(
+    cam.y - window.innerHeight / 2,
+    0,
+    world.y - window.innerHeight
+  );
+
+  for (let player in players) {
+    if (
+      players[player].x >= cam.x &&
+      players[player].x < cam.x + window.innerWidth
+    ) {
+      if (
+        players[player].y >= cam.y &&
+        players[player].y < cam.y + window.innerHeight
+      ) {
+        drawPlayer(players[player]);
+      }
+    }
+  }
+}
 
 // drawing a player/redrawing after movements
 const drawPlayer = player => {
   ctx.beginPath();
-  ctx.rect(player.x, player.y, player.width, player.height);
+  ctx.rect(player.x - cam.x, player.y - cam.y, player.width, player.height);
   ctx.fillStyle = "#0095DD";
   ctx.fill();
   ctx.closePath();
@@ -87,20 +129,20 @@ function createControls() {
 
 // how to handle moving the player along the canvas
 function keyDownHandler(e) {
-  position = { x: 0, y: 0 };
+  positionDiff = { x: 0, y: 0 };
   if (e.keyCode == 39 || e.keyCode == 68) {
-    position.x = 2; 
+    positionDiff.x = 2;
   } else if (e.keyCode == 37 || e.keyCode == 65) {
-    position.x = -2;
+    positionDiff.x = -2;
   } else if (e.keyCode == 38 || e.keyCode == 87) {
-    position.y = -2;
+    positionDiff.y = -2;
   } else if (e.keyCode == 40 || e.keyCode == 83) {
-    position.y = 2;
+    positionDiff.y = 2;
   }
 }
 
 function keyUpHandler() {
-  position = { x: 0, y: 0 };
+  positionDiff = { x: 0, y: 0 };
 }
 
 // binds all document keydown (from keyboard) to the handler for player movement
@@ -109,7 +151,23 @@ function bindControls() {
   document.addEventListener("keyup", keyUpHandler, false);
 }
 
+function drawMiniMap(players) {
+  ctxm.clearRect(0, 0, minimap.width, minimap.height);
+  for (let player in players) {
+    ctxm.beginPath();
+    ctxm.rect(
+      players[player].x,
+      players[player].y,
+      players[player].width,
+      players[player].height
+    );
+    ctxm.fillStyle = "green";
+    ctxm.fill();
+    ctxm.closePath();
+  }
+}
+
 // will continuously check if we need to resend the playermove
 setInterval(() => {
-  socket.emit("playerMove", position);
+  socket.emit("playerMove", positionDiff);
 }, 1000 / 60);

@@ -21,7 +21,8 @@
   "scripts": {
     "start": "webpack -w",
     "build": "webpack --progress --colors",
-    "dev": "nodemon server/app.js --exec babel-node"
+    "dev": "nodemon server/app.js --exec babel-node",
+    "scrub": "rm -rf node_modules && npm install"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
