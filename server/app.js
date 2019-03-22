@@ -73,6 +73,7 @@ io.on("connection", socket => {
     };
     console.log(gameState.coins[socket.id]);
     console.log("hello player");
+
   });
 
   socket.on("playerMove", function(position) {
@@ -84,20 +85,18 @@ io.on("connection", socket => {
       ? gameState.players[socket.id].y
       : 0;
 
-    var newx = oldx + position.x
-    if (newx > canvasWidth){
+    var newx = oldx + position.x;
+    if (newx > canvasWidth) {
       newx = 0;
+    } else if (newx < 0) {
+      newx = canvasWidth;
     }
-    else if (newx < 0) {
-      newx = canvasWidth
-    }
-    
-    var newy = oldy + position.y
-    if (newy > canvasHeight){
+
+    var newy = oldy + position.y;
+    if (newy > canvasHeight) {
       newy = 0;
-    }
-    else if (newy < 0) {
-      newy = canvasHeight
+    } else if (newy < 0) {
+      newy = canvasHeight;
     }
 
     gameState.players[socket.id] = {
@@ -109,7 +108,8 @@ io.on("connection", socket => {
   });
 });
 
+
 // will continuously broadcast the state to the players
 setInterval(() => {
-  io.sockets.emit("state", gameState);
+      io.sockets.emit("state", gameState);
 }, 1000 / 60);

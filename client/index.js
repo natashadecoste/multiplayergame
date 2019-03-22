@@ -1,7 +1,7 @@
 import "./../styles/styles.scss";
 import nipplejs from "nipplejs";
 
-const canvas = document.getElementById("myCanvas");
+const canvas = document.getElementById("gameCanvas");
 const minimap = document.getElementById("minimap");
 
 const world = { x: 1000, y: 1000 };
@@ -17,10 +17,10 @@ init();
 
 function init() {
   // resizing to a full sized canvas
-  // canvas.width = window.innerWidth;
-  // canvas.height = window.innerHeight;
-  canvas.width = 1280;
-  canvas.height = 800;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  // canvas.width = 1280;
+  // canvas.height = 800;
 
   // binding the keyboard controls to the document
   bindControls();
@@ -62,9 +62,10 @@ manager
 socket.on("state", function(gameState) {
   try {
     getCameraPosition(gameState.players, socket.id);
-    drawThings(gameState.players);
-    drawMiniMap(gameState.players);
+    drawThings(gameState);
+    drawMiniMap(gameState);
   } catch (err) {
+    console.log(err);
     console.log("no players yet ...");
   }
 });
@@ -80,7 +81,7 @@ function clamp(value, min, max) {
   return value;
 }
 
-function drawThings(players) {
+function drawThings(gameState) {
   ctx.clearRect(0, 0, canvas.width, canvas.height); //clear the viewport AFTER the matrix is reset
 
   //  Clamp the camera position to the world bounds while centering the camera around the player
@@ -91,17 +92,24 @@ function drawThings(players) {
     world.y - window.innerHeight
   );
 
-  for (let player in players) {
-    if (
-      players[player].x >= cam.x &&
-      players[player].x < cam.x + window.innerWidth
-    ) {
+    // want to pan the background according to camera
+    var p = document.getElementById("wrapper");
+    p.style.backgroundPositionX = -cam.x + "px";
+    p.style.backgroundPositionY = -cam.y + "px";
+
+  if (gameState.players) {
+    for (let player in gameState.players) {
       if (
-        players[player].y >= cam.y &&
-        players[player].y < cam.y + window.innerHeight
+        gameState.players[player].x >= cam.x &&
+        gameState.players[player].x < cam.x + window.innerWidth
       ) {
-        drawPlayer(players[player]);
-        drawCoin(gameState.coins[player]);
+        if (
+          gameState.players[player].y >= cam.y &&
+          gameState.players[player].y < cam.y + window.innerHeight
+        ) {
+          drawPlayer(gameState.players[player]);
+          drawCoin(gameState.coins[player]);
+        }
       }
     }
   }
@@ -162,15 +170,15 @@ function bindControls() {
   document.addEventListener("keyup", keyUpHandler, false);
 }
 
-function drawMiniMap(players) {
+function drawMiniMap(gameState) {
   ctxm.clearRect(0, 0, minimap.width, minimap.height);
-  for (let player in players) {
+  for (let player in gameState.players) {
     ctxm.beginPath();
     ctxm.rect(
-      players[player].x,
-      players[player].y,
-      players[player].width,
-      players[player].height
+      gameState.players[player].x,
+      gameState.players[player].y,
+      gameState.players[player].width,
+      gameState.players[player].height
     );
     ctxm.fillStyle = "green";
     ctxm.fill();

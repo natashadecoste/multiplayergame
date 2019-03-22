@@ -4,11 +4,24 @@
     margin: 0;
 }
 
-#myCanvas {
+#wrapper {
+    background: url("https://cdn3.f-cdn.com/contestentries/44321/3978939/526efa7f16ab4_thumbCard.jpg");
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: 5000px 5000px;
+    .background {
+        position: absolute;
+        clip: rect(0 100vw 100vh 0);
+        width: 5000px;
+        height: 5000px;
+        z-index: -1;
+    }
+}
+
+#gameCanvas {
     width: 100vw;
     height: 100vh;
-    background: lightgreen;
-
 }
 
 #minimap {
