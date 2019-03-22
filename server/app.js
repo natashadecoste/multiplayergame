@@ -21,15 +21,18 @@ function printAll(){
 }
 
 function randGenxy(){
-  // Access through array
-  // var newCoors = randGenxy();
-  // var newX = newCoors[0];
-  // var newY = newCoors[1];
-  // var newStr = newCoors[2];
+  // how to access:
+  // var randxy = randGenxy();
+  // var x = randxy.x;
+  // var y = randxy.y;
   var x = Math.floor(Math.random()*canvasWidth);
   var y = Math.floor(Math.random()*canvasHeight);
   var str = "'" + x + "," + y + "'"
-  return [x,y,str]
+  return {
+    x: x,
+    y: y,
+    str: str
+  };
 }
 // game logic
 const gameState = {
