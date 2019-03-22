@@ -11,6 +11,26 @@ const io = require("socket.io")(server);
 const canvasWidth = 1280;
 const canvasHeight = 800;
 
+function printAll(){
+  // Print out everything in gameState
+  // Currently, only player coordinates 
+  for (let player in gameState.players){
+    console.log("player.x " + gameState.players[player].x);
+    console.log("player.y " + gameState.players[player].y);
+  }
+}
+
+function randGenxy(){
+  // Access through array
+  // var newCoors = randGenxy();
+  // var newX = newCoors[0];
+  // var newY = newCoors[1];
+  // var newStr = newCoors[2];
+  var x = Math.floor(Math.random()*canvasWidth);
+  var y = Math.floor(Math.random()*canvasHeight);
+  var str = "'" + x + "," + y + "'"
+  return [x,y,str]
+}
 // game logic
 const gameState = {
   players: {},
@@ -75,6 +95,10 @@ io.on("connection", socket => {
     console.log(gameState.coins[socket.id]);
     console.log("hello player");
 
+  });
+
+  socket.on("printAll", function() {
+    printAll();
   });
 
   socket.on("playerMove", function(position) {

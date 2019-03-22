@@ -28,6 +28,7 @@ function init() {
   // let the server know we have another player
   socket.emit("newPlayer");
   //socket.emit("newCoin");
+  //socket.emit("printAll");
 }
 
 manager
