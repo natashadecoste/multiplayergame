@@ -63,7 +63,7 @@ socket.on("state", function(gameState) {
   try {
     getCameraPosition(gameState.players, socket.id);
     drawThings(gameState);
-    drawMiniMap(gameState);
+    drawui(gameState);
   } catch (err) {
     console.log(err);
     console.log("no players yet ...");
@@ -168,6 +168,14 @@ function keyUpHandler() {
 function bindControls() {
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
+}
+
+function drawui(gameState) {
+  drawMiniMap(gameState);
+  ctx.fillStyle = "black";
+  ctx.font = "30px Comic Sans MS";
+  var test = 2;
+  ctx.fillText("Score: " + gameState.players[socket.id].score, canvas.width/18, 35);
 }
 
 function drawMiniMap(gameState) {

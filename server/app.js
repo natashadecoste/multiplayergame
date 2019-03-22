@@ -60,7 +60,8 @@ io.on("connection", socket => {
       x: 200,
       y: 200,
       width: 20,
-      height: 20
+      height: 20,
+      score: 1
     };
     gameState.coins[socket.id] = {
       // randomizing spawn point and color
@@ -103,7 +104,8 @@ io.on("connection", socket => {
       x: newx,
       y: newy,
       width: 20,
-      height: 20
+      height: 20,
+      score: 0
     };
   });
 });
