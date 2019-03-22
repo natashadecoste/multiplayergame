@@ -39,6 +39,8 @@ const gameState = {
   players: {},
   coins: {}
 };
+//the key:value pair for this object will be 'x,y':type
+var coors = new Map();
 
 app.use(morgan("dev"));
 
@@ -74,6 +76,13 @@ io.on("connection", socket => {
 
   socket.on("disconnect", function() {
     console.log("user disconnected");
+    //if a user disconnects, removing his coordinates from the map but keeping the coin. Right now the coin is being sketchy and sometimes erasing
+    //but all the coordinates are still kept in it
+    var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
+    coors.delete(strPlayer);
+    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
+    coors.delete(strCoin);
+    coors.delete('0,0'); // sometimes a 0,0 entry finds its way into the map so this just deletes it
     delete gameState.players[socket.id];
   });
 
@@ -84,19 +93,27 @@ io.on("connection", socket => {
       y: 200,
       width: 20,
       height: 20,
-      score: 1
+      score: 1,
+      type : "player"
     };
+    
     gameState.coins[socket.id] = {
-      // randomizing spawn point and color
-      x : Math.floor(Math.random()*600),
-      y : Math.floor(Math.random()*600),
+      // randomizing spawn point, color is red for visibility right now
+      //x : Math.floor(Math.random()*canvasWidth),
+      //y : Math.floor(Math.random()*canvasHeight),
+      x : 350,
+      y : 350,
       radius : 10,
-      r : Math.floor(Math.random()*255),
-      g : Math.floor(Math.random()*255),
-      b : Math.floor(Math.random()*255)
+      r : 255,
+      g : 0,
+      b : 0,
+      type : "coin"
     };
-    console.log(gameState.coins[socket.id]);
-    console.log("hello player");
+    //adding the new players and coins coordinates to our coors object to keep track of where everything is on the canvas
+    var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
+    coors.set(strPlayer, gameState.players[socket.id].type);
+    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
+    coors.set(strCoin, gameState.coins[socket.id].type);
 
   });
 
@@ -132,8 +149,46 @@ io.on("connection", socket => {
       y: newy,
       width: 20,
       height: 20,
-      score: 0
+      score: 0,
+      type : "player"
     };
+    
+    //function gives us back the abs value of two distances
+    var diff = function (a, b) { return Math.abs(a - b); }
+
+    //updating movement within our coordinates table
+    //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
+    var oldXY = oldx + "," + oldy;
+    var newXY = newx + "," + newy;
+    var objType = gameState.players[socket.id].type;
+    coors.delete(oldXY);
+    coors.set(newXY, objType);
+
+    //if coins exist
+    if(gameState.coins[socket.id]){
+      var coinX = gameState.coins[ssocket.id].x;
+      var coinY = gameState.coins[socket.id].y;
+
+      //collision detection
+      //squarex/y - circlex/y <= 30 (radius + the squares width&height)
+      if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
+        console.log('collision');
+      }
+    }
+
+    for(var ele of coors.entries()){
+      console.log(ele)
+    };
+
+    /*if (Object.keys(gameState.players).length > 0){
+      if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
+        gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
+        gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
+        gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
+        gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
+          console.log("collision detected");
+        };
+      };*/
   });
 });
 

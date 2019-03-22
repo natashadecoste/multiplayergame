@@ -128,7 +128,7 @@ const drawPlayer = player => {
 // drawing a coin
 const drawCoin = coin => {
   ctx.beginPath();
-  ctx.arc(coin.x, coin.y, coin.radius, Math.PI*2,0, false);
+  ctx.arc(coin.x - cam.x, coin.y - cam.y, coin.radius, Math.PI*2,0, false);
   ctx.fillStyle = "rgba(" + coin.r + "," + coin.g + "," + coin.b + ",1)";
   ctx.fill();
   ctx.closePath();
