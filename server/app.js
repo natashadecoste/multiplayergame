@@ -166,7 +166,7 @@ io.on("connection", socket => {
 
     //if coins exist
     if(gameState.coins[socket.id]){
-      var coinX = gameState.coins[ssocket.id].x;
+      var coinX = gameState.coins[socket.id].x;
       var coinY = gameState.coins[socket.id].y;
 
       //collision detection
