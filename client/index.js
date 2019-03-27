@@ -113,6 +113,7 @@ function drawThings(gameState) {
     }
   }
   if (gameState.coins){
+    console.log(gameState.coins);
     for (let coin in gameState.coin) {
       if (
         gameState.coins[coin].x >= cam.x &&

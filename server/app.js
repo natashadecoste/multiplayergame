@@ -8,14 +8,10 @@ const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 
-<<<<<<< Updated upstream
 const worldWidth = 1000;
 const worldHeight = 1000;
-=======
-const canvasWidth = 1280;
-const canvasHeight = 800;
+
 var coinCount = 0;
->>>>>>> Stashed changes
 
 function printAll(){
   // Print out everything in gameState
@@ -129,81 +125,85 @@ io.on("connection", socket => {
   });
 
   socket.on("playerMove", function(position) {
-    // updating player x and y once they move
+    if(gameState.players){
+      // updating player x and y once they move
     var oldx = gameState.players[socket.id]
-      ? gameState.players[socket.id].x
-      : 0;
-    var oldy = gameState.players[socket.id]
-      ? gameState.players[socket.id].y
-      : 0;
+    ? gameState.players[socket.id].x
+    : 0;
+  var oldy = gameState.players[socket.id]
+    ? gameState.players[socket.id].y
+    : 0;
 
-    // If the player has reach the boder
-    // His position doesn't change  
-    var newx = oldx + position.x;
-    if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
-      newx = oldx;
-    }
+  // If the player has reach the boder
+  // His position doesn't change  
+  var newx = oldx + position.x;
+  if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
+    newx = oldx;
+  }
 
-    var newy = oldy + position.y;
-    if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
-      newy = oldy;
-    }
+  var newy = oldy + position.y;
+  if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
+    newy = oldy;
+  }
 
-    var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
+  var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
 
-    gameState.players[socket.id] = {
-      x: newx,
-      y: newy,
-      width: 20,
-      height: 20,
-      score: score,
-      type : "player"
-    };
-    
-    //function gives us back the abs value of two distances
-    var diff = function (a, b) { return Math.abs(a - b); }
+  gameState.players[socket.id] = {
+    x: newx,
+    y: newy,
+    width: 20,
+    height: 20,
+    score: score,
+    type : "player"
+  };
+  
+  //function gives us back the abs value of two distances
+  var diff = function (a, b) { return Math.abs(a - b); }
 
-    //updating movement within our coordinates table
-    //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
-    var oldXY = oldx + "," + oldy;
-    var newXY = newx + "," + newy;
-    var objType = gameState.players[socket.id].type;
-    coors.delete(oldXY);
-    coors.set(newXY, objType);
-    /*
-    //if coins exist
-    if(Object.keys(gameState.coins).length != 0){
-      //collision detection
-      //squarex/y - circlex/y <= 30 (radius + the squares width&height)
-      if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
-        console.log('collision');
-        console.log(gameState.coins[1]);
-        /*for(let i = 0; i < Object.keys(gameState.coins).length; i++){
-          console.log(i);
-          if(gameState.coins[i].x == coinX){
-            console.log('deleted');
-            delete gameState.coins[i];
-            coors.delete(currCoinXY);
-            gameState.players[socketID].score++;
-          }
+  //updating movement within our coordinates table
+  //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
+  var oldXY = oldx + "," + oldy;
+  var newXY = newx + "," + newy;
+  var objType = gameState.players[socket.id].type;
+  coors.delete(oldXY);
+  coors.set(newXY, objType);
+  /*
+  //if coins exist
+  if(Object.keys(gameState.coins).length != 0){
+    //collision detection
+    //squarex/y - circlex/y <= 30 (radius + the squares width&height)
+    if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
+      console.log('collision');
+      console.log(gameState.coins[1]);
+      /*for(let i = 0; i < Object.keys(gameState.coins).length; i++){
+        console.log(i);
+        if(gameState.coins[i].x == coinX){
+          console.log('deleted');
+          delete gameState.coins[i];
+          coors.delete(currCoinXY);
+          gameState.players[socketID].score++;
         }
       }
-    }*/
+    }
+  }*/
 
-    for(var ele of coors.entries()){
-      console.log(gameState.coins)
-      console.log(ele)
-    };
+  for(var ele of coors.entries()){
+    console.log(gameState.coins)
+    console.log(ele)
+  };
 
-    /*if (Object.keys(gameState.players).length > 0){
-      if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
-        gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
-        gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
-        gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
-        gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
-          console.log("collision detected");
-        };
-      };*/
+  /*if (Object.keys(gameState.players).length > 0){
+    if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
+      gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
+      gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
+      gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
+      gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
+        console.log("collision detected");
+      };
+    };*/
+
+    }
+    
   });
 });
 
