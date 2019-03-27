@@ -19,8 +19,6 @@ function init() {
   // resizing to a full sized canvas
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  // canvas.width = 1280;
-  // canvas.height = 800;
 
   // binding the keyboard controls to the document
   bindControls();
