@@ -11,6 +11,8 @@ const io = require("socket.io")(server);
 const worldWidth = 1000;
 const worldHeight = 1000;
 
+var coinCount = 0;
+
 function printAll(){
   // Print out everything in gameState
   // Currently, only player coordinates 
@@ -80,8 +82,6 @@ io.on("connection", socket => {
     //but all the coordinates are still kept in it
     var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
     coors.delete(strPlayer);
-    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
-    coors.delete(strCoin);
     coors.delete('0,0'); // sometimes a 0,0 entry finds its way into the map so this just deletes it
     delete gameState.players[socket.id];
   });
@@ -96,8 +96,8 @@ io.on("connection", socket => {
       score: 1,
       type : "player"
     };
-    
-    gameState.coins[socket.id] = {
+
+    gameState.coins[coinCount] = {
       // randomizing spawn point, color is red for visibility right now
       //x : Math.floor(Math.random()*worldWidth),
       //y : Math.floor(Math.random()*worldHeight),
@@ -109,12 +109,15 @@ io.on("connection", socket => {
       b : 0,
       type : "coin"
     };
+    
     //adding the new players and coins coordinates to our coors object to keep track of where everything is on the canvas
     var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
     coors.set(strPlayer, gameState.players[socket.id].type);
-    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
-    coors.set(strCoin, gameState.coins[socket.id].type);
+    var strCoin = gameState.coins[coinCount].x + "," + gameState.coins[coinCount].y;
+    coors.set(strCoin, gameState.coins[coinCount].type);
 
+    //increment coin counter
+    coinCount++;
   });
 
   socket.on("printAll", function() {
@@ -122,8 +125,10 @@ io.on("connection", socket => {
   });
 
   socket.on("playerMove", function(position) {
-    // updating player x and y once they move
+    if(gameState.players){
+      // updating player x and y once they move
     var oldx = gameState.players[socket.id]
+<<<<<<< HEAD
       ? gameState.players[socket.id].x
       : 0;
     var oldy = gameState.players[socket.id]
@@ -145,52 +150,84 @@ io.on("connection", socket => {
     }
     
     var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
+=======
+    ? gameState.players[socket.id].x
+    : 0;
+  var oldy = gameState.players[socket.id]
+    ? gameState.players[socket.id].y
+    : 0;
 
-    gameState.players[socket.id] = {
-      x: newx,
-      y: newy,
-      width: 20,
-      height: 20,
-      score: score,
-      type : "player"
-    };
-    
-    //function gives us back the abs value of two distances
-    var diff = function (a, b) { return Math.abs(a - b); }
+  // If the player has reach the boder
+  // His position doesn't change  
+  var newx = oldx + position.x;
+  if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
+    newx = oldx;
+  }
 
-    //updating movement within our coordinates table
-    //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
-    var oldXY = oldx + "," + oldy;
-    var newXY = newx + "," + newy;
-    var objType = gameState.players[socket.id].type;
-    coors.delete(oldXY);
-    coors.set(newXY, objType);
+  var newy = oldy + position.y;
+  if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
+    newy = oldy;
+  }
 
-    //if coins exist
-    if(gameState.coins[socket.id]){
-      var coinX = gameState.coins[socket.id].x;
-      var coinY = gameState.coins[socket.id].y;
+  var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
+>>>>>>> 6e48e5b91ecaec578f355cf9a5e71559974862c9
 
-      //collision detection
-      //squarex/y - circlex/y <= 30 (radius + the squares width&height)
-      if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
-        console.log('collision');
+  gameState.players[socket.id] = {
+    x: newx,
+    y: newy,
+    width: 20,
+    height: 20,
+    score: score,
+    type : "player"
+  };
+  
+  //function gives us back the abs value of two distances
+  var diff = function (a, b) { return Math.abs(a - b); }
+
+  //updating movement within our coordinates table
+  //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
+  var oldXY = oldx + "," + oldy;
+  var newXY = newx + "," + newy;
+  var objType = gameState.players[socket.id].type;
+  coors.delete(oldXY);
+  coors.set(newXY, objType);
+  /*
+  //if coins exist
+  if(Object.keys(gameState.coins).length != 0){
+    //collision detection
+    //squarex/y - circlex/y <= 30 (radius + the squares width&height)
+    if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
+      console.log('collision');
+      console.log(gameState.coins[1]);
+      /*for(let i = 0; i < Object.keys(gameState.coins).length; i++){
+        console.log(i);
+        if(gameState.coins[i].x == coinX){
+          console.log('deleted');
+          delete gameState.coins[i];
+          coors.delete(currCoinXY);
+          gameState.players[socketID].score++;
+        }
       }
     }
+  }*/
 
-    for(var ele of coors.entries()){
-      console.log(ele)
-    };
+  for(var ele of coors.entries()){
+    console.log(gameState.coins)
+    console.log(ele)
+  };
 
-    /*if (Object.keys(gameState.players).length > 0){
-      if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
-        gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
-        gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
-        gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
-        gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
-          console.log("collision detected");
-        };
-      };*/
+  /*if (Object.keys(gameState.players).length > 0){
+    if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
+      gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
+      gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
+      gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
+      gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
+        console.log("collision detected");
+      };
+    };*/
+
+    }
+    
   });
 });
 
