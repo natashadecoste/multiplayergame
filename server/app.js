@@ -144,12 +144,14 @@ io.on("connection", socket => {
       newy = canvasHeight;
     }
 
+    var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
+
     gameState.players[socket.id] = {
       x: newx,
       y: newy,
       width: 20,
       height: 20,
-      score: 0,
+      score: score,
       type : "player"
     };
     
