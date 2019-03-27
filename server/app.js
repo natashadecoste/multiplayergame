@@ -8,8 +8,14 @@ const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 
+<<<<<<< Updated upstream
 const worldWidth = 1000;
 const worldHeight = 1000;
+=======
+const canvasWidth = 1280;
+const canvasHeight = 800;
+var coinCount = 0;
+>>>>>>> Stashed changes
 
 function printAll(){
   // Print out everything in gameState
@@ -80,8 +86,6 @@ io.on("connection", socket => {
     //but all the coordinates are still kept in it
     var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
     coors.delete(strPlayer);
-    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
-    coors.delete(strCoin);
     coors.delete('0,0'); // sometimes a 0,0 entry finds its way into the map so this just deletes it
     delete gameState.players[socket.id];
   });
@@ -96,8 +100,8 @@ io.on("connection", socket => {
       score: 1,
       type : "player"
     };
-    
-    gameState.coins[socket.id] = {
+
+    gameState.coins[coinCount] = {
       // randomizing spawn point, color is red for visibility right now
       //x : Math.floor(Math.random()*worldWidth),
       //y : Math.floor(Math.random()*worldHeight),
@@ -109,12 +113,15 @@ io.on("connection", socket => {
       b : 0,
       type : "coin"
     };
+    
     //adding the new players and coins coordinates to our coors object to keep track of where everything is on the canvas
     var strPlayer = gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
     coors.set(strPlayer, gameState.players[socket.id].type);
-    var strCoin = gameState.coins[socket.id].x + "," + gameState.coins[socket.id].y;
-    coors.set(strCoin, gameState.coins[socket.id].type);
+    var strCoin = gameState.coins[coinCount].x + "," + gameState.coins[coinCount].y;
+    coors.set(strCoin, gameState.coins[coinCount].type);
 
+    //increment coin counter
+    coinCount++;
   });
 
   socket.on("printAll", function() {
@@ -163,20 +170,28 @@ io.on("connection", socket => {
     var objType = gameState.players[socket.id].type;
     coors.delete(oldXY);
     coors.set(newXY, objType);
-
+    /*
     //if coins exist
-    if(gameState.coins[socket.id]){
-      var coinX = gameState.coins[socket.id].x;
-      var coinY = gameState.coins[socket.id].y;
-
+    if(Object.keys(gameState.coins).length != 0){
       //collision detection
       //squarex/y - circlex/y <= 30 (radius + the squares width&height)
       if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
         console.log('collision');
+        console.log(gameState.coins[1]);
+        /*for(let i = 0; i < Object.keys(gameState.coins).length; i++){
+          console.log(i);
+          if(gameState.coins[i].x == coinX){
+            console.log('deleted');
+            delete gameState.coins[i];
+            coors.delete(currCoinXY);
+            gameState.players[socketID].score++;
+          }
+        }
       }
-    }
+    }*/
 
     for(var ele of coors.entries()){
+      console.log(gameState.coins)
       console.log(ele)
     };
 

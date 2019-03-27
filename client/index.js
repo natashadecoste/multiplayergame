@@ -12,6 +12,7 @@ const socket = io();
 const manager = createControls();
 var positionDiff = { x: 0, y: 0 };
 var cam = { x: 0, y: 0 };
+var coinCounter = 0;
 
 init();
 
@@ -107,7 +108,21 @@ function drawThings(gameState) {
           gameState.players[player].y < cam.y + window.innerHeight
         ) {
           drawPlayer(gameState.players[player]);
-          drawCoin(gameState.coins[player]);
+        }
+      }
+    }
+  }
+  if (gameState.coins){
+    for (let coin in gameState.coin) {
+      if (
+        gameState.coins[coin].x >= cam.x &&
+        gameState.coins[coin].x < cam.x + window.innerWidth
+      ) {
+        if (
+          gameState.coins[coin].y >= cam.y &&
+          gameState.coins[coin].y < cam.y + window.innerHeight
+        ) {
+          drawCoin(gameState.coins[coin]);
         }
       }
     }
