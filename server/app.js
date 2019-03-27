@@ -133,15 +133,17 @@ io.on("connection", socket => {
     // If the player has reach the boder
     // His position doesn't change  
     var newx = oldx + position.x;
-    if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
-      newx = oldx;
+    if (gameState.players[socket.id]){
+      if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
+        newx = oldx;
+      }
+  
+      var newy = oldy + position.y;
+      if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
+        newy = oldy;
+      }
     }
-
-    var newy = oldy + position.y;
-    if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
-      newy = oldy;
-    }
-
+    
     var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
 
     gameState.players[socket.id] = {
@@ -192,6 +194,10 @@ io.on("connection", socket => {
   });
 });
 
+//spawn one coin every 5 seconds
+var coinSpawner = setInterval(() => {
+      console.log("Spawn coin");
+}, 1000 * 5);
 
 // will continuously broadcast the state to the players
 setInterval(() => {
