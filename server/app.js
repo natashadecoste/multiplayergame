@@ -8,8 +8,8 @@ const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 
-const canvasWidth = 1280;
-const canvasHeight = 800;
+const worldWidth = 1000;
+const worldHeight = 1000;
 
 function printAll(){
   // Print out everything in gameState
@@ -25,8 +25,8 @@ function randGenxy(){
   // var randxy = randGenxy();
   // var x = randxy.x;
   // var y = randxy.y;
-  var x = Math.floor(Math.random()*canvasWidth);
-  var y = Math.floor(Math.random()*canvasHeight);
+  var x = Math.floor(Math.random()*worldWidth);
+  var y = Math.floor(Math.random()*worldHeight);
   var str = "'" + x + "," + y + "'"
   return {
     x: x,
@@ -99,8 +99,8 @@ io.on("connection", socket => {
     
     gameState.coins[socket.id] = {
       // randomizing spawn point, color is red for visibility right now
-      //x : Math.floor(Math.random()*canvasWidth),
-      //y : Math.floor(Math.random()*canvasHeight),
+      //x : Math.floor(Math.random()*worldWidth),
+      //y : Math.floor(Math.random()*worldHeight),
       x : 350,
       y : 350,
       radius : 10,
@@ -130,18 +130,16 @@ io.on("connection", socket => {
       ? gameState.players[socket.id].y
       : 0;
 
+    // If the player has reach the boder
+    // His position doesn't change  
     var newx = oldx + position.x;
-    if (newx > canvasWidth) {
-      newx = 0;
-    } else if (newx < 0) {
-      newx = canvasWidth;
+    if ((newx > worldWidth - gameState.players[socket.id].width) || (newx < 0)){
+      newx = oldx;
     }
 
     var newy = oldy + position.y;
-    if (newy > canvasHeight) {
-      newy = 0;
-    } else if (newy < 0) {
-      newy = canvasHeight;
+    if ((newy > worldHeight - gameState.players[socket.id].height) || (newy < 0)){
+      newy = oldy;
     }
 
     var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
