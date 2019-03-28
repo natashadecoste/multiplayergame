@@ -1,6 +1,7 @@
 import "./../styles/styles.scss";
 import nipplejs from "nipplejs";
 
+// canvas elements for the main game frame and minimap
 const canvas = document.getElementById("gameCanvas");
 const minimap = document.getElementById("minimap");
 
@@ -12,6 +13,9 @@ const socket = io();
 const manager = createControls();
 var positionDiff = { x: 0, y: 0 };
 var cam = { x: 0, y: 0 };
+
+// gets the html element for player boat
+var sprite = document.getElementById('sprite');
 
 init();
 
@@ -25,8 +29,6 @@ function init() {
 
   // let the server know we have another player
   socket.emit("newPlayer");
-  //socket.emit("newCoin");
-  //socket.emit("printAll");
 }
 
 manager
@@ -91,10 +93,10 @@ function drawThings(gameState) {
     world.y - window.innerHeight
   );
 
-    // want to pan the background according to camera
-    var p = document.getElementById("wrapper");
-    p.style.backgroundPositionX = -cam.x + "px";
-    p.style.backgroundPositionY = -cam.y + "px";
+  // want to pan the background according to camera
+  var p = document.getElementById("wrapper");
+  p.style.backgroundPositionX = -cam.x + "px";
+  p.style.backgroundPositionY = -cam.y + "px";
 
   if (gameState.players) {
     for (let player in gameState.players) {
@@ -107,7 +109,6 @@ function drawThings(gameState) {
           gameState.players[player].y < cam.y + window.innerHeight
         ) {
           drawPlayer(gameState.players[player]);
-          drawCoin(gameState.coins[player]);
         }
       }
     }
@@ -116,11 +117,17 @@ function drawThings(gameState) {
 
 // drawing a player/redrawing after movements
 const drawPlayer = player => {
-  ctx.beginPath();
-  ctx.rect(player.x - cam.x, player.y - cam.y, player.width, player.height);
-  ctx.fillStyle = "#0095DD";
-  ctx.fill();
-  ctx.closePath();
+  // ctx.beginPath();
+  // ctx.rect(player.x - cam.x, player.y - cam.y, player.width, player.height);
+  // ctx.fillStyle = "#0095DD";
+  // ctx.fill();
+  // ctx.closePath();
+  try {
+    ctx.drawImage(sprite, player.x - cam.x, player.y - cam.y, 50, 80 );
+  }
+  catch (error){
+    console.log('the error is ' +  error);
+  }
 };
 
 // drawing a coin

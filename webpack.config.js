@@ -1,24 +1,25 @@
 module.exports = {
-  entry: ['babel-polyfill', './client/index.js'],
-  mode: 'development',
+  entry: ["babel-polyfill", "./client/index.js"],
+  mode: "development",
   output: {
     path: __dirname,
-    filename: './public/bundle.js'
+    filename: "./public/bundle.js"
   },
   context: __dirname,
   module: {
     rules: [
       {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: ["file-loader"]
+      },
+      {
         test: /\.jsx?$/,
         exclude: /(node_modules|bower_components)/,
-        loader: 'babel-loader'
+        loader: "babel-loader"
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.scss$/,
@@ -36,4 +37,4 @@ module.exports = {
       }
     ]
   }
-}
+};
