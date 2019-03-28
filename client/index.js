@@ -14,8 +14,10 @@ const manager = createControls();
 var positionDiff = { x: 0, y: 0 };
 var cam = { x: 0, y: 0 };
 
+// PLAYER STUFF
 // gets the html element for player boat
 var sprite = document.getElementById('sprite');
+var spriteDir = 'up';
 
 init();
 
@@ -123,7 +125,7 @@ const drawPlayer = player => {
   // ctx.fill();
   // ctx.closePath();
   try {
-    ctx.drawImage(sprite, player.x - cam.x, player.y - cam.y, 50, 80 );
+    ctx.drawImage(sprite, player.x - cam.x, player.y - cam.y, player.width, player.height );
   }
   catch (error){
     console.log('the error is ' +  error);

@@ -162,14 +162,8 @@ io.on("connection", socket => {
         ? gameState.players[socket.id].score
         : 0;
 
-      gameState.players[socket.id] = {
-        x: newx,
-        y: newy,
-        width: 20,
-        height: 20,
-        score: score,
-        type: "player"
-      };
+      gameState.players[socket.id].x = newx;
+      gameState.players[socket.id].y = newy;
 
       //function gives us back the abs value of two distances
       var diff = function(a, b) {
