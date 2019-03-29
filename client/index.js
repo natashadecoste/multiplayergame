@@ -20,6 +20,9 @@ var sprite = document.getElementById("sprite");
 var spriteDir = "up";
 var TO_RADIANS = Math.PI / 180; // to rotate the sprite
 
+// enemy stuff
+var spriteKraken = document.getElementById("sprite-kraken");
+
 init();
 
 function init() {
@@ -105,6 +108,14 @@ function drawThings(gameState) {
   p.style.backgroundPositionX = -cam.x + "px";
   p.style.backgroundPositionY = -cam.y + "px";
 
+
+  // need to draw the kraken under the player 
+  for(var i=0; i<gameState.enemies.length; i++){
+    drawKraken({x: gameState.enemies[i].x, y: gameState.enemies[i].y});
+  }
+
+
+  // drawing the player(s)
   if (gameState.players) {
     for (let player in gameState.players) {
       if (
@@ -120,6 +131,23 @@ function drawThings(gameState) {
       }
     }
   }
+
+}
+
+
+const drawKraken = position => {
+  if (
+    position.x >= cam.x &&
+    position.x < cam.x + window.innerWidth
+  ) {
+    if (
+      position.y >= cam.y &&
+      position.y < cam.y + window.innerHeight
+    ) {
+      ctx.drawImage(spriteKraken, position.x -cam.x, position.y - cam.y, 95, 95);
+    }
+  }
+  
 }
 
 // drawing a player/redrawing after movements

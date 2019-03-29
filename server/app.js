@@ -39,7 +39,8 @@ function randGenxy() {
 // game logic
 const gameState = {
   players: {},
-  coins: {}
+  coins: {},
+  enemies: []
 };
 
 
@@ -123,6 +124,8 @@ io.on("connection", socket => {
     //increment coin counter
     coinCount++;
 
+
+    spawnKraken();
     // will continuously broadcast the state to the players
     setInterval(() => {
       io.sockets.emit("state", gameState);
@@ -217,7 +220,11 @@ io.on("connection", socket => {
   });
 });
 
-// //spawn one coin every 5 seconds
-// var coinSpawner = setInterval(() => {
-//   console.log("Spawn coin");
-// }, 1000 * 5);
+
+function spawnKraken(){
+  gameState.enemies.push({type: "kraken", x: 500, y:500});
+}
+//spawn one coin every 5 seconds
+var coinSpawner = setInterval(() => {
+  console.log("Spawn coin");
+}, 1000 * 5);
