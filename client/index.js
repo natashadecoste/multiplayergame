@@ -16,8 +16,9 @@ var cam = { x: 0, y: 0 };
 
 // PLAYER STUFF
 // gets the html element for player boat
-var sprite = document.getElementById('sprite');
-var spriteDir = 'up';
+var sprite = document.getElementById("sprite");
+var spriteDir = "up";
+var TO_RADIANS = Math.PI / 180; // to rotate the sprite
 
 init();
 
@@ -40,15 +41,19 @@ manager
       positionDiff = { x: 0, y: 0 };
       if (evt.type == "dir:up") {
         positionDiff.y = -2;
+        spriteDir = "up";
       }
       if (evt.type == "dir:left") {
         positionDiff.x = -2;
+        spriteDir = "left";
       }
       if (evt.type == "dir:down") {
         positionDiff.y = 2;
+        spriteDir = "down";
       }
       if (evt.type == "dir:right") {
         positionDiff.x = 2;
+        spriteDir = "right";
       }
     });
 
@@ -119,23 +124,39 @@ function drawThings(gameState) {
 
 // drawing a player/redrawing after movements
 const drawPlayer = player => {
-  // ctx.beginPath();
-  // ctx.rect(player.x - cam.x, player.y - cam.y, player.width, player.height);
-  // ctx.fillStyle = "#0095DD";
-  // ctx.fill();
-  // ctx.closePath();
   try {
-    ctx.drawImage(sprite, player.x - cam.x, player.y - cam.y, player.width, player.height );
-  }
-  catch (error){
-    console.log('the error is ' +  error);
+    var rotate;
+    switch (spriteDir) {
+      case "up":
+        rotate = 0;
+        break;
+      case "left":
+        rotate = 270 * TO_RADIANS;
+        break;
+      case "right":
+        rotate = 90 * TO_RADIANS;
+        break;
+      case "down":
+        rotate = 180 * TO_RADIANS;
+        break;
+    }
+
+    ctx.save();
+    ctx.translate(player.x - cam.x, player.y - cam.y);
+    ctx.rotate(rotate);
+    ctx.translate(-player.width/2, -player.height/2);
+    ctx.drawImage(sprite, 0, 0);
+    ctx.restore();
+
+  } catch (error) {
+    console.log("the error is " + error);
   }
 };
 
 // drawing a coin
 const drawCoin = coin => {
   ctx.beginPath();
-  ctx.arc(coin.x - cam.x, coin.y - cam.y, coin.radius, Math.PI*2,0, false);
+  ctx.arc(coin.x - cam.x, coin.y - cam.y, coin.radius, Math.PI * 2, 0, false);
   ctx.fillStyle = "rgba(" + coin.r + "," + coin.g + "," + coin.b + ",1)";
   ctx.fill();
   ctx.closePath();
@@ -159,12 +180,16 @@ function keyDownHandler(e) {
   positionDiff = { x: 0, y: 0 };
   if (e.keyCode == 39 || e.keyCode == 68) {
     positionDiff.x = 2;
+    spriteDir = "right";
   } else if (e.keyCode == 37 || e.keyCode == 65) {
     positionDiff.x = -2;
+    spriteDir = "left";
   } else if (e.keyCode == 38 || e.keyCode == 87) {
     positionDiff.y = -2;
+    spriteDir = "up";
   } else if (e.keyCode == 40 || e.keyCode == 83) {
     positionDiff.y = 2;
+    spriteDir = "down";
   }
 }
 
@@ -183,7 +208,11 @@ function drawui(gameState) {
   ctx.fillStyle = "black";
   ctx.font = "30px Comic Sans MS";
   var test = 2;
-  ctx.fillText("Score: " + gameState.players[socket.id].score, canvas.width/18, 35);
+  ctx.fillText(
+    "Score: " + gameState.players[socket.id].score,
+    canvas.width / 18,
+    35
+  );
 }
 
 function drawMiniMap(gameState) {
