@@ -77,7 +77,7 @@ server.listen(PORT, () => {
 io.on("connection", socket => {
   console.log("a user connected:", socket.id);
 
-  socket.on("disconnect", function() {
+  socket.on("disconnect", function () {
     console.log("user disconnected");
     //if a user disconnects, removing his coordinates from the map but keeping the coin. Right now the coin is being sketchy and sometimes erasing
     //but all the coordinates are still kept in it
@@ -88,7 +88,7 @@ io.on("connection", socket => {
     delete gameState.players[socket.id];
   });
 
-  socket.on("newPlayer", function() {
+  socket.on("newPlayer", function () {
     // adding new player to players array and setting their spawn location
     gameState.players[socket.id] = {
       x: 200,
@@ -129,11 +129,11 @@ io.on("connection", socket => {
     }, 1000 / 60);
   });
 
-  socket.on("printAll", function() {
+  socket.on("printAll", function () {
     printAll();
   });
 
-  socket.on("playerMove", function(position) {
+  socket.on("playerMove", function (position) {
     if (gameState.players) {
       // updating player x and y once they move
       var oldx = gameState.players[socket.id]
@@ -146,14 +146,16 @@ io.on("connection", socket => {
       // If the player has reach the boder
       // His position doesn't change
       var newx = oldx + position.x;
-      if (newx > worldWidth - gameState.players[socket.id].width || newx < 0) {
+      if (newx > worldWidth - gameState.players[socket.id].width ||
+        newx < gameState.players[socket.id].width / 2
+      ) {
         newx = oldx;
       }
 
       var newy = oldy + position.y;
       if (
-        newy > worldHeight - gameState.players[socket.id].height ||
-        newy < 0
+        newy > worldHeight - gameState.players[socket.id].height / 2 ||
+        newy < gameState.players[socket.id].height / 2
       ) {
         newy = oldy;
       }
@@ -166,7 +168,7 @@ io.on("connection", socket => {
       gameState.players[socket.id].y = newy;
 
       //function gives us back the abs value of two distances
-      var diff = function(a, b) {
+      var diff = function (a, b) {
         return Math.abs(a - b);
       };
 
