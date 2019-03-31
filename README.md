@@ -35,3 +35,8 @@ The terminal running npm start is running webpack and watching files for changes
 - Nicolas Tristani
 - Dragan Visekruna
 - Nathan Mangaol
+
+# TODO
+- Troy and Danny need to merge code for collision detection 
+    - After each move, coors need to be updated
+- When to clear coors?

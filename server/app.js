@@ -10,8 +10,16 @@ const io = require("socket.io")(server);
 
 const worldWidth = 1000;
 const worldHeight = 1000;
+const totalPos = worldHeight * worldHeight;
 
 var coinCount = 0;
+
+// A hashmap to keep track of all the objects on canvas 
+// the key:value pair for this object will be 'x,y':type
+// Add a new entity: coors.set('300,600' , 'player') or
+//                   coors.set(test.str , 'player')
+// Get type: coors.get('300,600')
+var coors = new Map();
 
 function printAll() {
   // Print out everything in gameState
@@ -22,19 +30,43 @@ function printAll() {
   }
 }
 
+function printMap(myMap){
+  myMap.forEach(function(value, key) {
+  console.log(key + ' : ' + value);
+});
+}
+
 function randGenxy() {
-  // how to access:
+  // How to access:
   // var randxy = randGenxy();
   // var x = randxy.x;
   // var y = randxy.y;
   var x = Math.floor(Math.random() * worldWidth);
   var y = Math.floor(Math.random() * worldHeight);
-  var str = "'" + x + "," + y + "'";
+  var str = x + "," + y;
   return {
     x: x,
     y: y,
     str: str
   };
+}
+
+function genValidCoors(type){
+  if (coors.size >= totalPos){
+    return {
+      str: "MAXED OUT"
+    }
+  }
+  else {
+    var ret = randGenxy()
+    // While the coors already exist in the coors
+    // gen another pair
+    while (coors.get(ret.str)){
+      ret = randGenxy();
+    }
+    coors.set(ret.str, type)
+    return ret;
+  }
 }
 // game logic
 const gameState = {
@@ -42,10 +74,6 @@ const gameState = {
   coins: {},
   enemies: []
 };
-
-
-//the key:value pair for this object will be 'x,y':type
-var coors = new Map();
 
 app.use(morgan("dev"));
 
@@ -91,21 +119,24 @@ io.on("connection", socket => {
 
   socket.on("newPlayer", function () {
     // adding new player to players array and setting their spawn location
+    var newXY = genValidCoors('player');
+
     gameState.players[socket.id] = {
-      x: 200,
-      y: 200,
+      x: newXY.x,
+      y: newXY.y,
       width: 50,
       height: 80,
       score: 1,
       type: "player"
     };
 
+    newXY = genValidCoors('coin')
     gameState.coins[coinCount] = {
       // randomizing spawn point, color is red for visibility right now
       //x : Math.floor(Math.random()*worldWidth),
       //y : Math.floor(Math.random()*worldHeight),
-      x: 350,
-      y: 350,
+      x: newXY.x,
+      y: newXY.y,
       radius: 10,
       r: 255,
       g: 0,
@@ -113,19 +144,14 @@ io.on("connection", socket => {
       type: "coin"
     };
 
-    //adding the new players and coins coordinates to our coors object to keep track of where everything is on the canvas
-    var strPlayer =
-      gameState.players[socket.id].x + "," + gameState.players[socket.id].y;
-    coors.set(strPlayer, gameState.players[socket.id].type);
-    var strCoin =
-      gameState.coins[coinCount].x + "," + gameState.coins[coinCount].y;
-    coors.set(strCoin, gameState.coins[coinCount].type);
-
     //increment coin counter
     coinCount++;
 
-
     spawnKraken();
+
+    // Check all the objects have been added into coors
+    printMap(coors);
+
     // will continuously broadcast the state to the players
     setInterval(() => {
       io.sockets.emit("state", gameState);
@@ -222,7 +248,8 @@ io.on("connection", socket => {
 
 
 function spawnKraken(){
-  gameState.enemies.push({type: "kraken", x: 500, y:500});
+  var newXY = genValidCoors('kraken');
+  gameState.enemies.push({type: "kraken", x: newXY.x, y:newXY.y});
 }
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
