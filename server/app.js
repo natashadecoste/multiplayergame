@@ -144,7 +144,7 @@ io.on("connection", socket => {
       type: "coin"
     };
 
-    //increment coin counter
+    //increment num of coins
     coinCount++;
 
     spawnKraken();
@@ -189,61 +189,47 @@ io.on("connection", socket => {
         newy = oldy;
       }
 
-      var score = gameState.players[socket.id]
-        ? gameState.players[socket.id].score
-        : 0;
+    gameState.players[socket.id] = {
+      x: newx,
+      y: newy,
+      width: 20,
+      height: 20,
+      score: score,
+      type : "player"
+    };
 
-      gameState.players[socket.id].x = newx;
-      gameState.players[socket.id].y = newy;
+    //function gives us back the abs value of two distances
+    var diff = function (a, b) { return Math.abs(a - b); }
 
-      //function gives us back the abs value of two distances
-      var diff = function (a, b) {
-        return Math.abs(a - b);
-      };
-
-      //updating movement within our coordinates table
-      //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
-      var oldXY = oldx + "," + oldy;
-      var newXY = newx + "," + newy;
-      var objType = gameState.players[socket.id].type;
-      coors.delete(oldXY);
-      coors.set(newXY, objType);
-      /*
-  //if coins exist
-  if(Object.keys(gameState.coins).length != 0){
-    //collision detection
-    //squarex/y - circlex/y <= 30 (radius + the squares width&height)
-    if(diff(newx, coinX) <= 30 || diff(newy, coinX) <= 30 || diff(newx, coinY) <= 30 || diff(newy, coinY) <= 30){
-      console.log('collision');
-      console.log(gameState.coins[1]);
-      /*for(let i = 0; i < Object.keys(gameState.coins).length; i++){
-        console.log(i);
-        if(gameState.coins[i].x == coinX){
-          console.log('deleted');
-          delete gameState.coins[i];
-          coors.delete(currCoinXY);
-          gameState.players[socketID].score++;
-        }
+    //updating movement within our coordinates table
+    //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
+    var oldXY = oldx + "," + oldy;
+    var newXY = newx + "," + newy;
+    var objType = gameState.players[socket.id].type;
+    coors.delete(oldXY);
+    coors.set(newXY, objType);
+    
+    //if coins exist
+    if(Object.keys(gameState.coins).length != 0){
+      //collision detection
+      for(let i = 0; i < Object.keys(gameState.coins).length; i++){
+        if (!(gameState.coins[i] === gameState.players[socket.id] ||
+          gameState.coins[i].x + gameState.coins[i].radius < newx ||
+          gameState.coins[i].y + gameState.coins[i].radius < newy ||
+          gameState.coins[i].x - gameState.coins[i].radius > newx + gameState.players[socket.id].width ||
+          gameState.coins[i].y - gameState.coins[i].radius > newy + gameState.players[socket.id].height)) {
+            delete gameState.coins[i];
+            gameState.players[socket.id].score++;
+            coinCount = coinCount - 1;
+          }
       }
     }
-  }*/
 
-      for (var ele of coors.entries()) {
-        // console.log(gameState.coins);
-        // console.log(ele);
-      }
-
-      /*if (Object.keys(gameState.players).length > 0){
-    if (!(gameState.coins[socket.id] === gameState.players[socket.id] ||
-      gameState.coins[socket.id].x + gameState.coins[socket.id].radius < gameState.players[socket.id].x ||
-      gameState.coins[socket.id].y + gameState.coins[socket.id].radius < gameState.players[socket.id].y ||
-      gameState.coins[socket.id].x - gameState.coins[socket.id].radius > gameState.players[socket.id].x + gameState.players[socket.id].width ||
-      gameState.coins[socket.id].y - gameState.coins[socket.id].radius > gameState.players[socket.id].y + gameState.players[socket.id].height)) {
-        console.log("collision detected");
-      };
+    /*for(var ele of coors.entries()){
+      console.log(gameState.coins)
+      console.log(ele)
     };*/
-    }
-  });
+  }
 });
 
 
@@ -254,4 +240,4 @@ function spawnKraken(){
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
   console.log("Spawn coin");
-}, 1000 * 5);
+}, 1000 * 5)});

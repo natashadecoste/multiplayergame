@@ -131,7 +131,12 @@ function drawThings(gameState) {
       }
     }
   }
-
+    //draw all the coins
+    if (gameState.coins){
+      for(let i = 0; i < Object.keys(gameState.coins).length; i++){
+            drawCoin(gameState.coins[i]);
+          }
+        }
 }
 
 
@@ -147,7 +152,6 @@ const drawKraken = position => {
       ctx.drawImage(spriteKraken, position.x -cam.x, position.y - cam.y, 95, 95);
     }
   }
-  
 }
 
 // drawing a player/redrawing after movements
