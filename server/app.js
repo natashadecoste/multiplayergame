@@ -194,7 +194,7 @@ io.on("connection", socket => {
       y: newy,
       width: 20,
       height: 20,
-      score: score,
+      score: gameState.players[socket.id].score,
       type : "player"
     };
 
@@ -208,7 +208,7 @@ io.on("connection", socket => {
     var objType = gameState.players[socket.id].type;
     coors.delete(oldXY);
     coors.set(newXY, objType);
-    
+    /* ===================================== TODO: COLLISION DETECTION NOT WORKING WITH NEW SPRITE =========================================
     //if coins exist
     if(Object.keys(gameState.coins).length != 0){
       //collision detection
@@ -223,7 +223,7 @@ io.on("connection", socket => {
             coinCount = coinCount - 1;
           }
       }
-    }
+    }*/
 
     /*for(var ele of coors.entries()){
       console.log(gameState.coins)
