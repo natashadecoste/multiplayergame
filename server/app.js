@@ -208,7 +208,7 @@ io.on("connection", socket => {
     var objType = gameState.players[socket.id].type;
     coors.delete(oldXY);
     coors.set(newXY, objType);
-    /* ===================================== TODO: COLLISION DETECTION NOT WORKING WITH NEW SPRITE =========================================
+    
     //if coins exist
     if(Object.keys(gameState.coins).length != 0){
       //collision detection
@@ -223,7 +223,17 @@ io.on("connection", socket => {
             coinCount = coinCount - 1;
           }
       }
-    }*/
+    }
+
+    /*if (!(gameState.enemies[0] === gameState.players[socket.id] ||
+      gameState.enemies[0].x + gameState.enemies[0].radius < newx ||
+      gameState.enemies[0].y + gameState.enemies[0].radius < newy ||
+      gameState.enemies[0].x - gameState.enemies[0].radius > newx + gameState.players[socket.id].width ||
+      gameState.enemies[0].y - gameState.enemies[0].radius > newy + gameState.players[socket.id].height)) {
+        delete gameState.players[socket.id];
+        gameState.players[socket.id].score++;
+        coinCount = coinCount - 1;
+      }*/
 
     /*for(var ele of coors.entries()){
       console.log(gameState.coins)
@@ -235,7 +245,7 @@ io.on("connection", socket => {
 
 function spawnKraken(){
   var newXY = genValidCoors('kraken');
-  gameState.enemies.push({type: "kraken", x: newXY.x, y:newXY.y});
+  gameState.enemies.push({type: "kraken", x: newXY.x, y:newXY.y, radius: 40});
 }
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
