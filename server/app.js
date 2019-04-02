@@ -163,6 +163,17 @@ io.on("connection", socket => {
   });
 
   socket.on("playerMove", function (position) {
+    // Game logic:
+    // 1) Front end index.js calls "playerMove"
+    // 2) Check bounds with newX, newY
+    // 3) Check collision
+    //    3.1) run collision detection func
+    //    3.2) if colDet reutrns a value:
+    //         'coin' : score ++
+    //       'player' : score /= 2
+    //       'kraken' : game over?
+    //    3.3) colDet returns nothing, go to step 4
+    // 4) Assign newX, newY to ship
     if (gameState.players) {
       // updating player x and y once they move
       var oldx = gameState.players[socket.id]
