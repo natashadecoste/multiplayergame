@@ -192,26 +192,29 @@ io.on("connection", socket => {
       // If the player has reach the boder
       // His position doesn't change
       var newx = oldx + position.x;
-      if (newx > worldWidth - gameState.players[socket.id].width ||
-        newx < gameState.players[socket.id].width / 2
+      if (gameState.players[socket.id] && (newx > worldWidth - gameState.players[socket.id].width ||
+        newx < gameState.players[socket.id].width / 2)
       ) {
         newx = oldx;
       }
 
       var newy = oldy + position.y;
       if (
-        newy > worldHeight - gameState.players[socket.id].height / 2 ||
-        newy < gameState.players[socket.id].height / 2
+        gameState.players[socket.id] &&
+        (newy > worldHeight - gameState.players[socket.id].height / 2 ||
+        newy < gameState.players[socket.id].height / 2)
       ) {
         newy = oldy;
       }
+
+    var score = gameState.players[socket.id] ? gameState.players[socket.id].score : 0;
 
     gameState.players[socket.id] = {
       x: newx,
       y: newy,
       width: 50,
       height: 80,
-      score: gameState.players[socket.id].score,
+      score: score,
       type : "player"
     };
 
