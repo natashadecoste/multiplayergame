@@ -240,14 +240,7 @@ function bindControls() {
 
 function drawui(gameState) {
   drawMiniMap(gameState);
-  ctx.fillStyle = "black";
-  ctx.font = "30px Comic Sans MS";
-  var test = 2;
-  ctx.fillText(
-    "Score: " + gameState.players[socket.id].score,
-    canvas.width / 18,
-    35
-  );
+  updateScore(gameState.players[socket.id].score);
 }
 
 function drawMiniMap(gameState) {
@@ -264,6 +257,10 @@ function drawMiniMap(gameState) {
     ctxm.fill();
     ctxm.closePath();
   }
+}
+
+function updateScore(newscore){
+  document.getElementById("score").innerHTML = newscore;
 }
 
 // will continuously check if we need to resend the playermove

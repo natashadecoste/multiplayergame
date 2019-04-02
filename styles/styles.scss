@@ -45,3 +45,20 @@
     top: 0;
     left: 0;
 }
+
+.score-wrapper {
+    background: rgba(14, 41, 77, 0.5);
+    position: absolute;
+    display: inline;
+    right: 1em;
+    top: 1em;
+    padding: 1em;
+    img {
+        width: 2em;
+    }
+    span#score{
+        color: white; 
+        font-family: "Arial", sans-serif;
+        padding-left: 1em;
+    }
+}
