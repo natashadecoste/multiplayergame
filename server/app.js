@@ -127,7 +127,7 @@ io.on("connection", socket => {
       y: newXY.y,
       width: 50,
       height: 80,
-      score: 1,
+      score: 0,
       type: "player"
     };
 
