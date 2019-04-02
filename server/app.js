@@ -192,8 +192,8 @@ io.on("connection", socket => {
     gameState.players[socket.id] = {
       x: newx,
       y: newy,
-      width: 20,
-      height: 20,
+      width: 50,
+      height: 80,
       score: gameState.players[socket.id].score,
       type : "player"
     };

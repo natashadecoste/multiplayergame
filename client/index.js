@@ -176,7 +176,9 @@ const drawPlayer = player => {
     ctx.save();
     ctx.translate(player.x - cam.x, player.y - cam.y);
     ctx.rotate(rotate);
-    ctx.translate(-player.width/2, -player.height/2);
+
+
+    ctx.translate(-player.width, -player.height);
     ctx.drawImage(sprite, 0, 0);
     ctx.restore();
 
