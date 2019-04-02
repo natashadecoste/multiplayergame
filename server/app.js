@@ -13,6 +13,7 @@ const worldHeight = 1000;
 const totalPos = worldHeight * worldHeight;
 
 var coinCount = 0;
+var enemyCount = 0;
 
 // A hashmap to keep track of all the objects on canvas 
 // the key:value pair for this object will be 'x,y':type
@@ -72,7 +73,7 @@ function genValidCoors(type){
 const gameState = {
   players: {},
   coins: {},
-  enemies: []
+  enemies: {}
 };
 
 app.use(morgan("dev"));
@@ -143,11 +144,16 @@ io.on("connection", socket => {
       b: 0,
       type: "coin"
     };
-
-    //increment num of coins
     coinCount++;
 
-    spawnKraken();
+    var newXY = genValidCoors('kraken');
+    gameState.enemies[enemyCount] = {
+      x : newXY.x,
+      y : newXY.y,
+      radius : 40,
+      type : "kraken"
+    };
+    enemyCount++;
 
     // Check all the objects have been added into coors
     printMap(coors);
@@ -209,9 +215,6 @@ io.on("connection", socket => {
       type : "player"
     };
 
-    //function gives us back the abs value of two distances
-    var diff = function (a, b) { return Math.abs(a - b); }
-
     //updating movement within our coordinates table
     //getting the oldXY string, deleting that key-value pair from the coordinates object, and adding in the newXY string in there
     var oldXY = oldx + "," + oldy;
@@ -235,29 +238,34 @@ io.on("connection", socket => {
           }
       }
     }
-
-    /*if (!(gameState.enemies[0] === gameState.players[socket.id] ||
-      gameState.enemies[0].x + gameState.enemies[0].radius < newx ||
-      gameState.enemies[0].y + gameState.enemies[0].radius < newy ||
-      gameState.enemies[0].x - gameState.enemies[0].radius > newx + gameState.players[socket.id].width ||
-      gameState.enemies[0].y - gameState.enemies[0].radius > newy + gameState.players[socket.id].height)) {
-        delete gameState.players[socket.id];
-        gameState.players[socket.id].score++;
-        coinCount = coinCount - 1;
-      }*/
+    //console.log(gameState.enemies[0]);
+    //kraken collision detection
+    if(Object.keys(gameState.enemies).length != 0){
+      for(let i = 0; i < Object.keys(gameState.enemies).length; i++){
+        if (!(gameState.enemies[i] === gameState.players[socket.id] ||
+          gameState.enemies[i].x + gameState.enemies[i].radius < newx ||
+          gameState.enemies[i].y + gameState.enemies[i].radius < newy ||
+          gameState.enemies[i].x - gameState.enemies[i].radius > newx + gameState.players[socket.id].width ||
+          gameState.enemies[i].y - gameState.enemies[i].radius > newy + gameState.players[socket.id].height)) {
+            //delete gameState.players[socket.id];
+            console.log('collision');
+          }
+        }
+      }
 
     /*for(var ele of coors.entries()){
-      console.log(gameState.coins)
+      console.log(gameState.enemies)
+      console.log(gameState.players)
       console.log(ele)
     };*/
   }
 });
 
 
-function spawnKraken(){
+/*function spawnKraken(){
   var newXY = genValidCoors('kraken');
   gameState.enemies.push({type: "kraken", x: newXY.x, y:newXY.y, radius: 40});
-}
+}*/
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
   console.log("Spawn coin");

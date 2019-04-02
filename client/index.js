@@ -110,10 +110,11 @@ function drawThings(gameState) {
 
 
   // need to draw the kraken under the player 
-  for(var i=0; i<gameState.enemies.length; i++){
-    drawKraken({x: gameState.enemies[i].x, y: gameState.enemies[i].y});
+  if(gameState.enemies){
+      for(var i=0; i < Object.keys(gameState.enemies).length; i++){
+        drawKraken(gameState.enemies[i]);
+    }
   }
-
 
   // drawing the player(s)
   if (gameState.players) {
