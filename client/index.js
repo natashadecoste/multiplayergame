@@ -23,6 +23,9 @@ var TO_RADIANS = Math.PI / 180; // to rotate the sprite
 // enemy stuff
 var spriteKraken = document.getElementById("sprite-kraken");
 
+// coin stuff
+var spriteCoin = document.getElementById("sprite-coin");
+
 init();
 
 function init() {
@@ -188,14 +191,29 @@ const drawPlayer = player => {
   }
 };
 
-// drawing a coin
 const drawCoin = coin => {
-  ctx.beginPath();
-  ctx.arc(coin.x - cam.x, coin.y - cam.y, coin.radius, Math.PI * 2, 0, false);
-  ctx.fillStyle = "rgba(" + coin.r + "," + coin.g + "," + coin.b + ",1)";
-  ctx.fill();
-  ctx.closePath();
-};
+  console.log(coin)
+  if (
+    coin.x >= cam.x &&
+    coin.x < cam.x + window.innerWidth
+  ) {
+    if (
+      coin.y >= cam.y &&
+      coin.y < cam.y + window.innerHeight
+    ) {
+      ctx.drawImage(spriteCoin, coin.x -cam.x, coin.y - cam.y, 30, 30);
+    }
+  }
+}
+
+// drawing a coin
+// const drawCoin = coin => {
+//   ctx.beginPath();
+//   ctx.arc(coin.x - cam.x, coin.y - cam.y, coin.radius, Math.PI * 2, 0, false);
+//   ctx.fillStyle = "rgba(" + coin.r + "," + coin.g + "," + coin.b + ",1)";
+//   ctx.fill();
+//   ctx.closePath();
+// };
 
 // creating the joystick
 // can change the options here for the joystick nipplejs library
