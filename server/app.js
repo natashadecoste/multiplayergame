@@ -128,7 +128,8 @@ io.on("connection", socket => {
       width: 50,
       height: 80,
       score: 0,
-      type: "player"
+      type: "player",
+      dir: "up"
     };
 
     newXY = genValidCoors('coin')
@@ -168,7 +169,7 @@ io.on("connection", socket => {
     printAll();
   });
 
-  socket.on("playerMove", function (position) {
+  socket.on("playerMove", function (position, direction) {
     // Game logic:
     // 1) Front end index.js calls "playerMove"
     // 2) Check bounds with newX, newY
@@ -215,7 +216,8 @@ io.on("connection", socket => {
       width: 50,
       height: 80,
       score: score,
-      type : "player"
+      type : "player",
+      dir: direction
     };
 
     //updating movement within our coordinates table

@@ -11,13 +11,23 @@ const ctxm = minimap.getContext("2d");
 
 const socket = io();
 const manager = createControls();
+
+const islands = document.getElementsByClassName("islands");
+const map = [
+  { x: 856, y: 800, width: 190, height: 180, png: 0 },
+  { x: 566, y: 480, width: 190, height: 200, png: 0 },
+  { x: 45, y: 880, width: 200 , height: 200, png: 2 }
+];
+
+// for updating the server on the new positios
 var positionDiff = { x: 0, y: 0 };
+var dir = "up";
 var cam = { x: 0, y: 0 };
 
 // PLAYER STUFF
 // gets the html element for player boat
 var sprite = document.getElementById("sprite");
-var spriteDir = "up";
+
 var TO_RADIANS = Math.PI / 180; // to rotate the sprite
 
 // enemy stuff
@@ -26,6 +36,7 @@ var spriteKraken = document.getElementById("sprite-kraken");
 // coin stuff
 var spriteCoin = document.getElementById("sprite-coin");
 
+// calling init
 init();
 
 function init() {
@@ -47,22 +58,21 @@ manager
       positionDiff = { x: 0, y: 0 };
       if (evt.type == "dir:up") {
         positionDiff.y = -2;
-        spriteDir = "up";
+        dir = "up";
       }
       if (evt.type == "dir:left") {
         positionDiff.x = -2;
-        spriteDir = "left";
+        dir = "left";
       }
       if (evt.type == "dir:down") {
         positionDiff.y = 2;
-        spriteDir = "down";
+        dir = "down";
       }
       if (evt.type == "dir:right") {
         positionDiff.x = 2;
-        spriteDir = "right";
+        dir = "right";
       }
     });
-
     nipple.on("end", function(evt, data) {
       // tell the server there has been a movement
       positionDiff = { x: 0, y: 0 };
@@ -75,9 +85,11 @@ manager
 // socket response to a state emit from the server
 socket.on("state", function(gameState) {
   try {
+    // clamping the camera
     getCameraPosition(gameState.players, socket.id);
     drawThings(gameState);
-    drawui(gameState);
+
+    drawui(gameState); // minimap needs to be last
   } catch (err) {
     console.log(err);
     console.log("no players yet ...");
@@ -111,11 +123,12 @@ function drawThings(gameState) {
   p.style.backgroundPositionX = -cam.x + "px";
   p.style.backgroundPositionY = -cam.y + "px";
 
+  drawIslands(map);
 
-  // need to draw the kraken under the player 
-  if(gameState.enemies){
-      for(var i=0; i < Object.keys(gameState.enemies).length; i++){
-        drawKraken(gameState.enemies[i]);
+  // need to draw the kraken under the player
+  if (gameState.enemies) {
+    for (var i = 0; i < Object.keys(gameState.enemies).length; i++) {
+      drawKraken(gameState.enemies[i]);
     }
   }
 
@@ -130,39 +143,41 @@ function drawThings(gameState) {
           gameState.players[player].y >= cam.y &&
           gameState.players[player].y < cam.y + window.innerHeight
         ) {
-          drawPlayer(gameState.players[player]);
+          drawPlayer(gameState.players[player], gameState.players[player].dir);
         }
       }
     }
   }
-    //draw all the coins
-    if (gameState.coins){
-      for(let i = 0; i < Object.keys(gameState.coins).length; i++){
-            drawCoin(gameState.coins[i]);
-          }
-        }
-}
-
-
-const drawKraken = position => {
-  if (
-    position.x >= cam.x &&
-    position.x < cam.x + window.innerWidth
-  ) {
-    if (
-      position.y >= cam.y &&
-      position.y < cam.y + window.innerHeight
-    ) {
-      ctx.drawImage(spriteKraken, position.x -cam.x, position.y - cam.y, 95, 95);
+  //draw all the coins
+  if (gameState.coins) {
+    for (let i = 0; i < Object.keys(gameState.coins).length; i++) {
+      drawCoin(gameState.coins[i]);
     }
   }
 }
 
+const drawKraken = position => {
+  if (position.x + 95 >= cam.x && position.x < cam.x + window.innerWidth) {
+    if (position.y + 95 >= cam.y && position.y < cam.y + window.innerHeight) {
+      ctx.drawImage(
+        spriteKraken,
+        position.x - cam.x,
+        position.y - cam.y,
+        95,
+        95
+      );
+    }
+  }
+};
+
 // drawing a player/redrawing after movements
-const drawPlayer = player => {
+const drawPlayer = (player, dir) => {
+  if (!dir) {
+    dir = "up";
+  }
   try {
     var rotate;
-    switch (spriteDir) {
+    switch (dir) {
       case "up":
         rotate = 0;
         break;
@@ -181,30 +196,22 @@ const drawPlayer = player => {
     ctx.translate(player.x - cam.x, player.y - cam.y);
     ctx.rotate(rotate);
 
-
     ctx.translate(-player.width, -player.height);
     ctx.drawImage(sprite, 0, 0);
     ctx.restore();
-
   } catch (error) {
     console.log("the error is " + error);
   }
 };
 
 const drawCoin = coin => {
-  console.log(coin)
-  if (
-    coin.x >= cam.x &&
-    coin.x < cam.x + window.innerWidth
-  ) {
-    if (
-      coin.y >= cam.y &&
-      coin.y < cam.y + window.innerHeight
-    ) {
-      ctx.drawImage(spriteCoin, coin.x -cam.x, coin.y - cam.y, 30, 30);
+  //console.log(coin)
+  if (coin.x >= cam.x && coin.x < cam.x + window.innerWidth) {
+    if (coin.y >= cam.y && coin.y < cam.y + window.innerHeight) {
+      ctx.drawImage(spriteCoin, coin.x - cam.x, coin.y - cam.y, 30, 30);
     }
   }
-}
+};
 
 // drawing a coin
 // const drawCoin = coin => {
@@ -256,6 +263,28 @@ function bindControls() {
   document.addEventListener("keyup", keyUpHandler, false);
 }
 
+function drawIslands(map) {
+  for (var x = 0; x < map.length; x++) {
+    if (
+      map[x].x + map[x].width >= cam.x &&
+      map[x].x < cam.x + window.innerWidth
+    ) {
+      if (
+        map[x].y + map[x].height >= cam.y &&
+        map[x].y < cam.y + window.innerHeight
+      ) {
+        ctx.drawImage(
+          islands[map[x].png],
+          map[x].x - cam.x,
+          map[x].y - cam.y,
+          map[x].width,
+          map[x].height
+        );
+      }
+    }
+  }
+}
+
 function drawui(gameState) {
   drawMiniMap(gameState);
   updateScore(gameState.players[socket.id].score);
@@ -277,11 +306,11 @@ function drawMiniMap(gameState) {
   }
 }
 
-function updateScore(newscore){
+function updateScore(newscore) {
   document.getElementById("score").innerHTML = newscore;
 }
 
 // will continuously check if we need to resend the playermove
 setInterval(() => {
-  socket.emit("playerMove", positionDiff);
+  socket.emit("playerMove", positionDiff, dir);
 }, 1000 / 60);
