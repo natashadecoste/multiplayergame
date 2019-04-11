@@ -145,8 +145,8 @@ io.on("connection", socket => {
     gameState.players[socket.id] = {
       x: newXY.x,
       y: newXY.y,
-      width: 50,
-      height: 80,
+      width: 60,
+      height: 90,
       score: 0,
       type: "player",
       dir: "up"
@@ -233,8 +233,8 @@ io.on("connection", socket => {
     gameState.players[socket.id] = {
       x: newx,
       y: newy,
-      width: 50,
-      height: 80,
+      width: 60,
+      height: 90,
       score: score,
       type : "player",
       dir: direction

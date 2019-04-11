@@ -196,8 +196,8 @@ const drawPlayer = (player, dir) => {
     ctx.translate(player.x - cam.x, player.y - cam.y);
     ctx.rotate(rotate);
 
-    ctx.translate(-player.width, -player.height);
-    ctx.drawImage(sprite, 0, 0);
+    ctx.translate(-player.width/2, -player.height/2);
+    ctx.drawImage(sprite, 0, 0, player.width, player.height);
     ctx.restore();
   } catch (error) {
     console.log("the error is " + error);
