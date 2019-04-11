@@ -11,7 +11,7 @@
 *  `npm start`
 open a new terminal
 *  `npm run dev`
-navigate to localhost:3000
+navigate to localhost:8080
 
 
 The terminal running npm start is running webpack and watching files for changes (with the entry point being index.js !this is important!). When files are changed, they are rebundled (js -> public/bundle.js, styles/styles.scss -> public/styles.css)
@@ -37,6 +37,15 @@ The terminal running npm start is running webpack and watching files for changes
 - Nathan Mangaol
 
 # TODO
-- Troy and Danny need to merge code for collision detection 
-    - After each move, coors need to be updated
+- Polished collision detection 
+- After each move, coors need to be updated
 - When to clear coors?
+
+# Features not included at end of production
+- Death screen
+- Player naming
+- Player v player combat
+- Procedurally generated island and other hazards
+
+
+https://shielded-basin-77873.herokuapp.com/
