@@ -302,7 +302,7 @@ function drawIslands(map) {
 
 function drawui(gameState) {
   drawMiniMap(gameState);
-  updateScore(gameState.players[socket.id].score);
+  updateScore(gameState.players[socket.id].score, gameState.players[socket.id].scoreB);
 }
 
 function drawMiniMap(gameState) {
@@ -321,8 +321,11 @@ function drawMiniMap(gameState) {
   }
 }
 
-function updateScore(newscore) {
+function updateScore(newscore, board) {
   document.getElementById("score").innerHTML = newscore;
+  document.getElementById("score1").innerHTML = board[0];
+  document.getElementById("score2").innerHTML = board[1];
+  document.getElementById("score3").innerHTML = board[2];
 }
 
 // will continuously check if we need to resend the playermove

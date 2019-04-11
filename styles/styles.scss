@@ -62,3 +62,32 @@
         padding-left: 1em;
     }
 }
+
+.scoreboard-wrapper {
+    background: rgba(14, 41, 77, 0.5);
+    position: absolute;
+    display: inline;
+    right: 1em;
+    top: 7em;
+    padding: 1em;
+    div#title{
+        color: white; 
+        font-family: "Arial", sans-serif;
+        //padding-left: 1em;
+    }
+    div#score1{
+        color: white; 
+        font-family: "Arial", sans-serif;
+        padding-left: 6em;
+    }
+    div#score2{
+        color: white; 
+        font-family: "Arial", sans-serif;
+        padding-left: 6em;
+    }
+    div#score3{
+        color: white; 
+        font-family: "Arial", sans-serif;
+        padding-left: 6em;
+    }
+}

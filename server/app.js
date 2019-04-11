@@ -28,6 +28,22 @@ var enemyCount = 0;
 // Get type: coors.get('300,600')
 var coors = new Map();
 
+var scores = [0,0,0,0];
+var scoresSort = new Array();
+var scount = 0;
+function popScores(){
+  //Populate score list with all scores
+  scount = 0;
+  for (let player in gameState.players) {
+    scores[scount] = gameState.players[player].score;
+    scount += 1;
+  }
+  //Sort this list in a new list
+  scoresSort = scores.slice(0);
+  scoresSort = scoresSort.sort();
+  scoresSort = scoresSort.reverse();
+}
+
 function printAll() {
   // Print out everything in gameState
   // Currently, only player coordinates
@@ -166,10 +182,10 @@ io.on("connection", socket => {
       width: 60,
       height: 90,
       score: 0,
+      scoreB: scoresSort,
       type: "player",
       dir: "up"
     };
-
     newXY = genValidCoors('coin')
     gameState.coins[coinCount] = {
       // randomizing spawn point, color is red for visibility right now
@@ -198,6 +214,7 @@ io.on("connection", socket => {
     printMap(coors);
 
     io.sockets.emit("initsuccess");
+    
 
     // will continuously broadcast the state to the players
     setInterval(() => {
@@ -221,6 +238,7 @@ io.on("connection", socket => {
     //       'kraken' : game over?
     //    3.3) colDet returns nothing, go to step 4
     // 4) Assign newX, newY to ship
+    popScores();
     if (gameState.players) {
       // updating player x and y once they move
       var oldx = gameState.players[socket.id]
@@ -256,6 +274,7 @@ io.on("connection", socket => {
       width: 60,
       height: 90,
       score: score,
+      scoreB: scoresSort,
       type : "player",
       dir: direction
     };
