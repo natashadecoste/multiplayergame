@@ -240,16 +240,16 @@ function keyDownHandler(e) {
   positionDiff = { x: 0, y: 0 };
   if (e.keyCode == 39 || e.keyCode == 68) {
     positionDiff.x = 2;
-    spriteDir = "right";
+    dir = "right";
   } else if (e.keyCode == 37 || e.keyCode == 65) {
     positionDiff.x = -2;
-    spriteDir = "left";
+    dir = "left";
   } else if (e.keyCode == 38 || e.keyCode == 87) {
     positionDiff.y = -2;
-    spriteDir = "up";
+    dir = "up";
   } else if (e.keyCode == 40 || e.keyCode == 83) {
     positionDiff.y = 2;
-    spriteDir = "down";
+    dir = "down";
   }
 }
 
