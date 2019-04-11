@@ -194,9 +194,8 @@ io.on("connection", socket => {
       x: newXY.x,
       y: newXY.y,
       radius: 10,
-      r: 255,
-      g: 0,
-      b: 0,
+      width: 75,
+      height: 78,
       type: "coin"
     };
     coinCount++;
@@ -206,6 +205,8 @@ io.on("connection", socket => {
       x : newXY.x,
       y : newXY.y,
       radius : 40,
+      width: 133,
+      height: 128.25,
       type : "kraken"
     };
     enemyCount++;
