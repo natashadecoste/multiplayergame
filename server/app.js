@@ -11,6 +11,12 @@ const io = require("socket.io")(server);
 const worldWidth = 1000;
 const worldHeight = 1000;
 const totalPos = worldHeight * worldHeight;
+const map = [
+  { x: 856, y: 800, width: 190, height: 180, png: 0 },
+  { x: 566, y: 480, width: 190, height: 200, png: 0 },
+  { x: 45, y: 880, width: 200 , height: 200, png: 2 }
+]; // for the islands
+
 
 var coinCount = 0;
 var enemyCount = 0;
@@ -35,6 +41,19 @@ function printMap(myMap){
   myMap.forEach(function(value, key) {
   console.log(key + ' : ' + value);
 });
+}
+
+
+function onLand(x,y){
+  for (var i = 0; i< map.length; i++){
+    if(map[x].x <= x && (map[x].x +map[x].width) >= x){
+      if(map[x].y <= y && (map[x].y +map[x].height) >= y){
+        return true;
+      }
+    }
+  }
+  return false;
+
 }
 
 function randGenxy() {
@@ -62,7 +81,8 @@ function genValidCoors(type){
     var ret = randGenxy()
     // While the coors already exist in the coors
     // gen another pair
-    while (coors.get(ret.str)){
+    
+    while (coors.get(ret.str) && onLand(ret.x, ret.y)){
       ret = randGenxy();
     }
     coors.set(ret.str, type)
@@ -253,7 +273,7 @@ io.on("connection", socket => {
           gameState.enemies[i].x - gameState.enemies[i].radius > newx + gameState.players[socket.id].width ||
           gameState.enemies[i].y - gameState.enemies[i].radius > newy + gameState.players[socket.id].height)) {
             //delete gameState.players[socket.id];
-            console.log('collision');
+            //console.log('collision');
           }
         }
       }
@@ -273,5 +293,5 @@ io.on("connection", socket => {
 }*/
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
-  console.log("Spawn coin");
+  //console.log("Spawn coin");
 }, 1000 * 5)});
