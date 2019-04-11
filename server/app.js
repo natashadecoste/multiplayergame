@@ -70,7 +70,25 @@ function randGenxy() {
     str: str
   };
 }
-
+function checkCollision(interactable, player, newx, newy){
+  //console.log(interactable[0].type);
+    //collision detection
+    for(let i = 0; i < Object.keys(interactable).length; i++){
+      if (!(interactable[i] === player ||
+        interactable[i].x + interactable[i].radius < newx ||
+        interactable[i].y + interactable[i].radius < newy ||
+        interactable[i].x - interactable[i].radius > newx + player.width ||
+        interactable[i].y - interactable[i].radius > newy + player.height)) {
+          if (interactable[i].type == "coin") {
+            console.log('deleting coin');
+            console.log(interactable)
+            delete gameState.coins[i];
+            player.score++;
+            coinCount = coinCount - 1;
+          }
+        }
+    }
+}
 function genValidCoors(type){
   if (coors.size >= totalPos){
     return {
@@ -249,9 +267,12 @@ io.on("connection", socket => {
     var objType = gameState.players[socket.id].type;
     coors.delete(oldXY);
     coors.set(newXY, objType);
-    
-    //if coins exist
+    console.log(Object.keys(gameState.coins).length)
     if(Object.keys(gameState.coins).length != 0){
+      checkCollision(gameState.coins, gameState.players[socket.id], newx, newy)
+    }
+    //if coins exist
+    /*if(Object.keys(gameState.coins).length != 0){
       //collision detection
       for(let i = 0; i < Object.keys(gameState.coins).length; i++){
         if (!(gameState.coins[i] === gameState.players[socket.id] ||
@@ -264,10 +285,10 @@ io.on("connection", socket => {
             coinCount = coinCount - 1;
           }
       }
-    }
+    }*/
     //console.log(gameState.enemies[0]);
     //kraken collision detection
-    if(Object.keys(gameState.enemies).length != 0){
+    /*if(Object.keys(gameState.enemies).length != 0){
       for(let i = 0; i < Object.keys(gameState.enemies).length; i++){
         if (!(gameState.enemies[i] === gameState.players[socket.id] ||
           gameState.enemies[i].x + gameState.enemies[i].radius < newx ||
@@ -279,7 +300,7 @@ io.on("connection", socket => {
           }
         }
       }
-
+      */
     /*for(var ele of coors.entries()){
       console.log(gameState.enemies)
       console.log(gameState.players)
