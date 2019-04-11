@@ -179,6 +179,8 @@ io.on("connection", socket => {
     // Check all the objects have been added into coors
     printMap(coors);
 
+    io.sockets.emit("initsuccess");
+
     // will continuously broadcast the state to the players
     setInterval(() => {
       io.sockets.emit("state", gameState);

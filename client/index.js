@@ -27,6 +27,8 @@ var cam = { x: 0, y: 0 };
 // PLAYER STUFF
 // gets the html element for player boat
 var sprite = document.getElementById("sprite");
+var enemySprite = document.getElementById("sprite-enemy");
+var mainplayer;
 
 var TO_RADIANS = Math.PI / 180; // to rotate the sprite
 
@@ -81,6 +83,13 @@ manager
   .on("removed", function(evt, nipple) {
     nipple.off("start move end dir plain"); // removing listener from all events
   });
+
+// so we know we are the player
+socket.on("initsuccess", function(){
+  console.log(socket.id);
+  mainplayer = socket.id;
+});
+
 
 // socket response to a state emit from the server
 socket.on("state", function(gameState) {
@@ -143,7 +152,7 @@ function drawThings(gameState) {
           gameState.players[player].y >= cam.y &&
           gameState.players[player].y < cam.y + window.innerHeight
         ) {
-          drawPlayer(gameState.players[player], gameState.players[player].dir);
+          drawPlayer(gameState.players[player], player);
         }
       }
     }
@@ -171,13 +180,13 @@ const drawKraken = position => {
 };
 
 // drawing a player/redrawing after movements
-const drawPlayer = (player, dir) => {
-  if (!dir) {
-    dir = "up";
+const drawPlayer = (player, playerSocket) => {
+  if (!player.dir) {
+    player.dir = "up";
   }
   try {
     var rotate;
-    switch (dir) {
+    switch (player.dir) {
       case "up":
         rotate = 0;
         break;
@@ -197,7 +206,13 @@ const drawPlayer = (player, dir) => {
     ctx.rotate(rotate);
 
     ctx.translate(-player.width/2, -player.height/2);
-    ctx.drawImage(sprite, 0, 0, player.width, player.height);
+    if(playerSocket == mainplayer){
+      ctx.drawImage(sprite, 0, 0, player.width, player.height);
+    }
+    else {
+      ctx.drawImage(enemySprite, 0, 0, player.width, player.height);
+    }
+    
     ctx.restore();
   } catch (error) {
     console.log("the error is " + error);
