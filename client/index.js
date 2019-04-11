@@ -38,6 +38,10 @@ var spriteKraken = document.getElementById("sprite-kraken");
 // coin stuff
 var spriteCoin = document.getElementById("sprite-coin");
 
+//sound/music stuff
+var bgmPlaying = false;
+var bgm = document.getElementById("backgroundMusic");
+
 // calling init
 init();
 
@@ -52,6 +56,24 @@ function init() {
   // let the server know we have another player
   socket.emit("newPlayer");
 }
+
+var musicInterval = setInterval(() => {
+  console.log("Starting background music");
+  var promise = bgm.play();
+  if (promise !== undefined) {
+    promise.then(_ => {
+      console.log("Auto play started");
+      bgmPlaying = true;
+    }).catch(error => {
+      console.log("Auto play denied");
+    });
+  }
+
+  if (bgmPlaying === true) {
+    clearInterval(musicInterval);
+    console.log("Music started");
+  }
+}, 1000 / 60);
 
 manager
   .on("added", function(evt, nipple) {
