@@ -41,6 +41,7 @@ var spriteCoin = document.getElementById("sprite-coin");
 //sound/music stuff
 var bgmPlaying = false;
 var bgm = document.getElementById("backgroundMusic");
+var coinSfx = document.getElementById("coinSound");
 
 // calling init
 init();
@@ -121,6 +122,16 @@ socket.on("state", function(gameState) {
     drawThings(gameState);
 
     drawui(gameState); // minimap needs to be last
+    if (gameState.players[socket.id].getCoin === true) {
+      var promise = coinSfx.play();
+      if (promise !== undefined) {
+        promise.then(_ => {
+          gameState.players[socket.id].getCoin = false;
+        }).catch(error => {
+          console.log("Auto play denied");
+        });
+      }
+    }
   } catch (err) {
     console.log(err);
     console.log("no players yet ...");

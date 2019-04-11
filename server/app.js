@@ -100,6 +100,7 @@ function checkCollision(interactable, player, newx, newy){
             console.log(interactable)
             delete gameState.coins[i];
             player.score++;
+            player.getCoin = true;
             coinCount = coinCount - 1;
           }
         }
