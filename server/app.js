@@ -12,9 +12,9 @@ const worldWidth = 1000;
 const worldHeight = 1000;
 const totalPos = worldHeight * worldHeight;
 const map = [
-  { x: 856, y: 800, width: 190, height: 180, png: 0 },
-  { x: 566, y: 480, width: 190, height: 200, png: 0 },
-  { x: 45, y: 880, width: 200 , height: 200, png: 2 }
+  { x: 856, y: 800, width: 190, height: 180, png: 0, type: "island" , radius: 40},
+  { x: 566, y: 480, width: 190, height: 200, png: 0, type: "island" , radius: 40},
+  { x: 45, y: 880, width: 200 , height: 200, png: 2, type: "island" , radius:40}
 ]; // for the islands
 
 
@@ -90,22 +90,43 @@ function checkCollision(interactable, player, newx, newy){
   //console.log(interactable[0].type);
     //collision detection
     for(let i = 0; i < Object.keys(interactable).length; i++){
-      if (!(interactable[i] === player ||
-        interactable[i].x + interactable[i].radius < newx ||
-        interactable[i].y + interactable[i].radius < newy ||
-        interactable[i].x - interactable[i].radius > newx + player.width ||
-        interactable[i].y - interactable[i].radius > newy + player.height)) {
-          if (interactable[i].type == "coin") {
-            console.log('deleting coin');
-            console.log(interactable)
-            delete gameState.coins[i];
-            player.score++;
-            player.getCoin = true;
-            coinCount = coinCount - 1;
-          }
+      if(!(interactable[i] == undefined)){
+        if (!(interactable[i] === player ||
+          interactable[i].x + interactable[i].radius < newx - 30 ||
+          interactable[i].y + interactable[i].radius < newy - 45||
+          interactable[i].x - interactable[i].radius > newx + player.width/2 ||
+          interactable[i].y - interactable[i].radius > newy + player.height/2)) {
+            if (interactable[i].type == "coin") {
+              console.log('deleting coin');
+              console.log(interactable)
+              delete gameState.coins[i];
+              player.score++;
+              player.getCoin = true;
+              coinCount = coinCount - 1;
+            }
+            else if (interactable[i].type == "kraken") {
+              console.log('kraken hit');
+              var newXY = genValidCoors('player');
+              player.x = newXY.x;
+              player.y = newXY.y;
+              player.score = player.score - 1;
+              player.getCoin = true;
+              //coinCount = coinCount - 1;
+              }
+              else if (interactable[i].type == "island") {
+                console.log('island hit');
+                var newXY = genValidCoors('player');
+                player.x = newXY.x;
+                player.y = newXY.y;
+                player.score = player.score - 1;
+                player.getCoin = true;
+                //coinCount = coinCount - 1;
+                }
+            }
         }
+      }
     }
-}
+      
 function genValidCoors(type){
   if (coors.size >= totalPos){
     return {
@@ -180,6 +201,8 @@ io.on("connection", socket => {
     gameState.players[socket.id] = {
       x: newXY.x,
       y: newXY.y,
+      //x: 350,
+      //y: 250,
       width: 60,
       height: 90,
       score: 0,
@@ -189,11 +212,10 @@ io.on("connection", socket => {
     };
     newXY = genValidCoors('coin')
     gameState.coins[coinCount] = {
-      // randomizing spawn point, color is red for visibility right now
-      //x : Math.floor(Math.random()*worldWidth),
-      //y : Math.floor(Math.random()*worldHeight),
       x: newXY.x,
       y: newXY.y,
+      //x: 250,
+      //y: 250,
       radius: 10,
       width: 75,
       height: 78,
@@ -205,7 +227,7 @@ io.on("connection", socket => {
     gameState.enemies[enemyCount] = {
       x : newXY.x,
       y : newXY.y,
-      radius : 40,
+      radius : 20,
       width: 133,
       height: 128.25,
       type : "kraken"
@@ -288,53 +310,15 @@ io.on("connection", socket => {
     var objType = gameState.players[socket.id].type;
     coors.delete(oldXY);
     coors.set(newXY, objType);
-    console.log(Object.keys(gameState.coins).length)
+    //console.log(Object.keys(gameState.coins).length)
     if(Object.keys(gameState.coins).length != 0){
       checkCollision(gameState.coins, gameState.players[socket.id], newx, newy)
     }
-    //if coins exist
-    /*if(Object.keys(gameState.coins).length != 0){
-      //collision detection
-      for(let i = 0; i < Object.keys(gameState.coins).length; i++){
-        if (!(gameState.coins[i] === gameState.players[socket.id] ||
-          gameState.coins[i].x + gameState.coins[i].radius < newx ||
-          gameState.coins[i].y + gameState.coins[i].radius < newy ||
-          gameState.coins[i].x - gameState.coins[i].radius > newx + gameState.players[socket.id].width ||
-          gameState.coins[i].y - gameState.coins[i].radius > newy + gameState.players[socket.id].height)) {
-            delete gameState.coins[i];
-            gameState.players[socket.id].score++;
-            coinCount = coinCount - 1;
-          }
-      }
-    }*/
-    //console.log(gameState.enemies[0]);
-    //kraken collision detection
-    /*if(Object.keys(gameState.enemies).length != 0){
-      for(let i = 0; i < Object.keys(gameState.enemies).length; i++){
-        if (!(gameState.enemies[i] === gameState.players[socket.id] ||
-          gameState.enemies[i].x + gameState.enemies[i].radius < newx ||
-          gameState.enemies[i].y + gameState.enemies[i].radius < newy ||
-          gameState.enemies[i].x - gameState.enemies[i].radius > newx + gameState.players[socket.id].width ||
-          gameState.enemies[i].y - gameState.enemies[i].radius > newy + gameState.players[socket.id].height)) {
-            //delete gameState.players[socket.id];
-            //console.log('collision');
-          }
-        }
-      }
-      */
-    /*for(var ele of coors.entries()){
-      console.log(gameState.enemies)
-      console.log(gameState.players)
-      console.log(ele)
-    };*/
+    checkCollision(gameState.enemies, gameState.players[socket.id], newx, newy)
+    //checkCollision(gameState.coins, gameState.players[socket.id], newx, newy)
   }
 });
 
-
-/*function spawnKraken(){
-  var newXY = genValidCoors('kraken');
-  gameState.enemies.push({type: "kraken", x: newXY.x, y:newXY.y, radius: 40});
-}*/
 //spawn one coin every 5 seconds
 var coinSpawner = setInterval(() => {
   //console.log("Spawn coin");

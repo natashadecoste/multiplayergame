@@ -170,6 +170,7 @@ function drawThings(gameState) {
   // need to draw the kraken under the player
   if (gameState.enemies) {
     for (var i = 0; i < Object.keys(gameState.enemies).length; i++) {
+      
       drawKraken(gameState.enemies[i]);
     }
   }
@@ -201,6 +202,7 @@ function drawThings(gameState) {
 const drawKraken = position => {
   if (position.x + 95 >= cam.x && position.x < cam.x + window.innerWidth) {
     if (position.y + 95 >= cam.y && position.y < cam.y + window.innerHeight) {
+      //ctx.fillRect(position.x, position.y, position.width, position.height);
       ctx.drawImage(
         spriteKraken,
         position.x - cam.x,
