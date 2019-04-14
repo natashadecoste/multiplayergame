@@ -150,6 +150,7 @@ function clamp(value, min, max) {
 }
 
 function drawThings(gameState) {
+  //console.log("drawThings: ", gameState)
   ctx.clearRect(0, 0, canvas.width, canvas.height); //clear the viewport AFTER the matrix is reset
 
   //  Clamp the camera position to the world bounds while centering the camera around the player
@@ -166,13 +167,13 @@ function drawThings(gameState) {
   p.style.backgroundPositionY = -cam.y + "px";
 
   drawIslands(map);
-
+  // console.log("The enemies are: ",gameState.enemies)
   // need to draw the kraken under the player
   if (gameState.enemies) {
-    for (var i = 0; i < Object.keys(gameState.enemies).length; i++) {
-      
+    for (var i in gameState.enemies){
       drawKraken(gameState.enemies[i]);
     }
+
   }
 
   // drawing the player(s)
@@ -200,16 +201,18 @@ function drawThings(gameState) {
 }
 
 const drawKraken = position => {
-  if (position.x + 95 >= cam.x && position.x < cam.x + window.innerWidth) {
-    if (position.y + 95 >= cam.y && position.y < cam.y + window.innerHeight) {
-      //ctx.fillRect(position.x, position.y, position.width, position.height);
-      ctx.drawImage(
-        spriteKraken,
-        position.x - cam.x,
-        position.y - cam.y,
-        95,
-        95
-      );
+  if (typeof position.x !== 'undefined'){
+    if (position.x + 95 >= cam.x && position.x < cam.x + window.innerWidth) {
+      if (position.y + 95 >= cam.y && position.y < cam.y + window.innerHeight) {
+        //ctx.fillRect(position.x, position.y, position.width, position.height);
+        ctx.drawImage(
+          spriteKraken,
+          position.x - cam.x,
+          position.y - cam.y,
+          95,
+          95
+        );
+      }
     }
   }
 };

@@ -192,6 +192,19 @@ io.on("connection", socket => {
     coors.delete(strPlayer);
     coors.delete("0,0"); // sometimes a 0,0 entry finds its way into the map so this just deletes it
     delete gameState.players[socket.id];
+    var numPlayer = Object.keys(gameState.players).length
+    console.log("the num of player is: ", numPlayer)
+    if (numPlayer == 0){
+      console.log("no user connected");
+      console.log("removing all the krakens");
+      gameState.enemies = {}
+      for (var [key, value] of coors) {
+        console.log(key + ' = ' + value);
+        if (value == 'kraken'){
+          coors.delete(key)
+        }
+      }
+    }
   });
 
   socket.on("newPlayer", function () {
